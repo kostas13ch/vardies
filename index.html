@@ -5,19 +5,32 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Πρόγραμμα Βαρδιών</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f5f7fb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;color:#172033}
+*{box-sizing:border-box}
+body{margin:0;background:#f5f7fb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;color:#172033}
 main{max-width:1000px;margin:auto;padding:12px}
 h1{margin:0 0 12px;padding:16px;background:#1f4e78;color:#fff;text-align:center;border-radius:14px;font-size:21px}
 .card{background:#fff;padding:12px;margin-bottom:12px;border-radius:14px;box-shadow:0 2px 10px #0001}
 .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 input,select,textarea,button{font:inherit;padding:10px;border:1px solid #ccd2da;border-radius:9px}
 button{background:#1f4e78;color:white;border:0;font-weight:700}
-.gray{background:#e8edf3;color:#172033}.red{background:#b42318}
+.gray{background:#e8edf3;color:#172033}
+.red{background:#b42318}
 .scroll{overflow:auto}
 table{border-collapse:collapse;min-width:850px;width:100%}
 th,td{border:1px solid #aaa;padding:8px;text-align:center}
-th{background:#fff2cc}.date td{background:#e2f0d9;font-weight:bold}.shift td{background:#fce4d6}
+th{background:#fff2cc}
+.date td{background:#e2f0d9;font-weight:bold}
+.shift td{background:#fce4d6}
+.helper td{background:#eef4ff;vertical-align:top}
+.helper-label{font-weight:bold;color:#344054}
 td select{width:100%}
+.candidates{display:flex;flex-direction:column;gap:4px;min-width:115px}
+.person{
+ padding:6px 5px;border-radius:7px;background:#dce9f8;color:#172033;
+ font-size:12px;font-weight:700;cursor:pointer;user-select:none
+}
+.person.off{background:#eee;color:#999;text-decoration:line-through;opacity:.65}
+.reset{padding:4px 6px;font-size:11px;background:#667085;margin-top:3px}
 .grid{display:grid;grid-template-columns:1fr 80px 85px;gap:7px;align-items:center}
 .head{font-weight:bold;background:#d9eaf7;padding:8px;border-radius:7px}
 #preview{display:none;position:fixed;inset:0;background:#000a;z-index:20;padding:15px;overflow:auto}
@@ -26,6 +39,7 @@ td select{width:100%}
 .small{font-size:13px;color:#667085}
 </style>
 </head>
+
 <body>
 <main>
 <h1>ΕΒΔΟΜΑΔΙΑΙΟ ΠΡΟΓΡΑΜΜΑ ΒΑΡΔΙΩΝ</h1>
@@ -47,20 +61,51 @@ td select{width:100%}
 <th>ΔΕΥΤΕΡΑ</th><th>ΤΡΙΤΗ</th><th>ΤΕΤΑΡΤΗ</th>
 <th>ΠΕΜΠΤΗ</th><th>ΠΑΡΑΣΚΕΥΗ</th><th>ΣΑΒΒΑΤΟ</th><th>ΚΥΡΙΑΚΗ</th>
 </tr>
-<tr class="date"><td>Ημερομηνία</td>
-<td id="d0"></td><td id="d1"></td><td id="d2"></td><td id="d3"></td><td id="d4"></td><td id="d5"></td><td id="d6"></td>
+
+<tr class="date">
+<td>Ημερομηνία</td>
+<td id="d0"></td><td id="d1"></td><td id="d2"></td><td id="d3"></td>
+<td id="d4"></td><td id="d5"></td><td id="d6"></td>
 </tr>
-<tr class="shift"><td><b>18:00–00:00</b></td>
-<td><select data-s="e" data-d="0"></select></td><td><select data-s="e" data-d="1"></select></td>
-<td><select data-s="e" data-d="2"></select></td><td><select data-s="e" data-d="3"></select></td>
-<td><select data-s="e" data-d="4"></select></td><td><select data-s="e" data-d="5"></select></td>
-<td><select data-s="e" data-d="6"></select></td></tr>
-<tr class="shift"><td><b>00:00–06:00</b></td>
-<td><select data-s="n" data-d="0"></select></td><td><select data-s="n" data-d="1"></select></td>
-<td><select data-s="n" data-d="2"></select></td><td><select data-s="n" data-d="3"></select></td>
-<td><select data-s="n" data-d="4"></select></td><td><select data-s="n" data-d="5"></select></td>
-<td><select data-s="n" data-d="6"></select></td></tr>
-<tr><td><b>Σημειώσεις</b></td><td colspan="7"><textarea id="notes" style="width:100%"></textarea></td></tr>
+
+<tr class="shift">
+<td><b>18:00–00:00</b></td>
+<td><select data-s="e" data-d="0"></select></td>
+<td><select data-s="e" data-d="1"></select></td>
+<td><select data-s="e" data-d="2"></select></td>
+<td><select data-s="e" data-d="3"></select></td>
+<td><select data-s="e" data-d="4"></select></td>
+<td><select data-s="e" data-d="5"></select></td>
+<td><select data-s="e" data-d="6"></select></td>
+</tr>
+
+<tr class="shift">
+<td><b>00:00–06:00</b></td>
+<td><select data-s="n" data-d="0"></select></td>
+<td><select data-s="n" data-d="1"></select></td>
+<td><select data-s="n" data-d="2"></select></td>
+<td><select data-s="n" data-d="3"></select></td>
+<td><select data-s="n" data-d="4"></select></td>
+<td><select data-s="n" data-d="5"></select></td>
+<td><select data-s="n" data-d="6"></select></td>
+</tr>
+
+<tr class="helper">
+<td class="helper-label">Υποψήφιοι<br>18:00–00:00</td>
+<td id="he0"></td><td id="he1"></td><td id="he2"></td><td id="he3"></td>
+<td id="he4"></td><td id="he5"></td><td id="he6"></td>
+</tr>
+
+<tr class="helper">
+<td class="helper-label">Υποψήφιοι<br>00:00–06:00</td>
+<td id="hn0"></td><td id="hn1"></td><td id="hn2"></td><td id="hn3"></td>
+<td id="hn4"></td><td id="hn5"></td><td id="hn6"></td>
+</tr>
+
+<tr>
+<td><b>Σημειώσεις</b></td>
+<td colspan="7"><textarea id="notes" style="width:100%"></textarea></td>
+</tr>
 </table>
 </div>
 
@@ -71,86 +116,330 @@ td select{width:100%}
 <input id="newName" placeholder="Νέο όνομα">
 <button onclick="addName()">Προσθήκη</button>
 </div>
-<p class="small">Οι αλλαγές αποθηκεύονται αυτόματα σε αυτή τη συσκευή.</p>
+<p class="small">
+Πατάς ένα όνομα στις βοηθητικές γραμμές για να το αποκλείσεις ή να το επαναφέρεις.
+Οι βοηθητικές γραμμές δεν εμφανίζονται στην τελική εικόνα.
+</p>
 </div>
 </main>
 
-<div id="preview"><div id="previewBox">
+<div id="preview">
+<div id="previewBox">
 <h3>Εικόνα προγράμματος</h3>
 <img id="img">
 <div class="controls" style="margin-top:10px">
 <button onclick="shareImage()">Κοινοποίηση / Αποθήκευση</button>
 <button onclick="downloadImage()" class="gray">Λήψη PNG</button>
 <button onclick="closePreview()" class="gray">Κλείσιμο</button>
-</div></div></div>
+</div>
+</div>
+</div>
 
 <script>
-const KEY="vardies_v1";
-let state=JSON.parse(localStorage.getItem(KEY)||"null")||{names:["ΔΗΜΗΤΡΗΣ","ΧΡΗΣΤΟΣ","ΚΩΣΤΑΣ","ΣΤΕΦΑΝΟΣ","ΝΙΚΟΣ"],weeks:{}};
+const KEY="vardies_v2";
+let old=JSON.parse(localStorage.getItem("vardies_v1")||"null");
+let state=JSON.parse(localStorage.getItem(KEY)||"null")||
+(old?{names:old.names,weeks:old.weeks}:{names:["ΔΗΜΗΤΡΗΣ","ΧΡΗΣΤΟΣ","ΚΩΣΤΑΣ","ΣΤΕΦΑΝΟΣ","ΝΙΚΟΣ"],weeks:{}});
+
 let blob,url;
 
 const pad=n=>String(n).padStart(2,"0");
 const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
 const fmt=d=>pad(d.getDate())+"/"+pad(d.getMonth()+1);
-function monday(d){d=new Date(d);let x=(d.getDay()+6)%7;d.setDate(d.getDate()-x);return d}
+
+function monday(d){
+ d=new Date(d);
+ let x=(d.getDay()+6)%7;
+ d.setDate(d.getDate()-x);
+ return d
+}
+
 week.value=ymd(monday(new Date()));
 
-function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function save(){
+ localStorage.setItem(KEY,JSON.stringify(state))
+}
+
 function W(){
  let k=week.value;
- if(!state.weeks[k])state.weeks[k]={e:Array(7).fill(""),n:Array(7).fill(""),notes:""};
- return state.weeks[k]
+ if(!state.weeks[k]){
+  state.weeks[k]={
+   e:Array(7).fill(""),
+   n:Array(7).fill(""),
+   notes:"",
+   excludedE:Array.from({length:7},()=>[]),
+   excludedN:Array.from({length:7},()=>[])
+  };
+ }
+ let w=state.weeks[k];
+
+ if(!w.e)w.e=Array(7).fill("");
+ if(!w.n)w.n=Array(7).fill("");
+ if(!w.notes)w.notes="";
+ if(!w.excludedE)w.excludedE=Array.from({length:7},()=>[]);
+ if(!w.excludedN)w.excludedN=Array.from({length:7},()=>[]);
+
+ return w
 }
+
 function dates(){
  let b=new Date(week.value+"T12:00");
- for(let i=0;i<7;i++){let x=new Date(b);x.setDate(b.getDate()+i);document.getElementById("d"+i).textContent=fmt(x)}
+ for(let i=0;i<7;i++){
+  let x=new Date(b);
+  x.setDate(b.getDate()+i);
+  document.getElementById("d"+i).textContent=fmt(x)
+ }
 }
+
 function render(){
- dates();let w=W();
+ dates();
+ let w=W();
+
  document.querySelectorAll("select[data-s]").forEach(s=>{
   let val=w[s.dataset.s][+s.dataset.d];
-  s.innerHTML='<option value="">—</option>'+state.names.map(n=>`<option>${n}</option>`).join("");
-  s.value=val;s.onchange=()=>{w[s.dataset.s][+s.dataset.d]=s.value;save();people()}
+  s.innerHTML='<option value="">—</option>'+
+   state.names.map(n=>`<option>${n}</option>`).join("");
+  s.value=val;
+  s.onchange=()=>{
+   w[s.dataset.s][+s.dataset.d]=s.value;
+   save();
+   people()
+  }
  });
- notes.value=w.notes;notes.oninput=()=>{w.notes=notes.value;save()};
+
+ notes.value=w.notes;
+ notes.oninput=()=>{
+  w.notes=notes.value;
+  save()
+ };
+
+ renderHelpers();
  people()
 }
+
+function renderHelpers(){
+ let w=W();
+
+ for(let d=0;d<7;d++){
+  helperCell("he"+d,"excludedE",d,w);
+  helperCell("hn"+d,"excludedN",d,w);
+ }
+}
+
+function helperCell(id,key,day,w){
+ let el=document.getElementById(id);
+ let excluded=w[key][day]||[];
+
+ el.innerHTML='<div class="candidates">'+
+  state.names.map((n,i)=>{
+   let off=excluded.includes(n);
+   return `<div class="person ${off?"off":""}" onclick="toggleCandidate('${key}',${day},${i})">${n}</div>`
+  }).join("")+
+  `<button class="reset" onclick="resetCandidates('${key}',${day})">Επαναφορά</button></div>`;
+}
+
+function toggleCandidate(key,day,index){
+ let w=W();
+ let name=state.names[index];
+ let arr=w[key][day]||[];
+ let p=arr.indexOf(name);
+
+ if(p>=0)arr.splice(p,1);
+ else arr.push(name);
+
+ w[key][day]=arr;
+ save();
+ renderHelpers()
+}
+
+function resetCandidates(key,day){
+ let w=W();
+ w[key][day]=[];
+ save();
+ renderHelpers()
+}
+
 function people(){
  let p=document.getElementById("people"),w=W();
- p.innerHTML='<div class="head">Όνομα</div><div class="head">Βάρδιες</div><div class="head"></div>';
+
+ p.innerHTML=
+ '<div class="head">Όνομα</div>'+
+ '<div class="head">Βάρδιες</div>'+
+ '<div class="head"></div>';
+
  state.names.forEach((n,i)=>{
   let count=[...w.e,...w.n].filter(x=>x==n).length;
-  p.innerHTML+=`<input value="${n}" onchange="rename(${i},this.value)"><b style="text-align:center">${count}</b><button class="gray" onclick="del(${i})">Διαγρ.</button>`
+
+  p.innerHTML+=
+   `<input value="${n}" onchange="rename(${i},this.value)">
+    <b style="text-align:center">${count}</b>
+    <button class="gray" onclick="del(${i})">Διαγρ.</button>`
  })
 }
-function rename(i,n){let old=state.names[i];n=n.trim().toUpperCase();if(!n)return;Object.values(state.weeks).forEach(w=>{w.e=w.e.map(x=>x==old?n:x);w.n=w.n.map(x=>x==old?n:x)});state.names[i]=n;save();render()}
-function addName(){let n=newName.value.trim().toUpperCase();if(!n||state.names.includes(n))return;state.names.push(n);newName.value="";save();render()}
-function del(i){if(confirm("Διαγραφή ονόματος;")){let n=state.names[i];state.names.splice(i,1);Object.values(state.weeks).forEach(w=>{w.e=w.e.map(x=>x==n?"":x);w.n=w.n.map(x=>x==n?"":x)});save();render()}}
-function thisWeek(){week.value=ymd(monday(new Date()));render()}
-function clearWeek(){if(confirm("Καθαρισμός αυτής της εβδομάδας;")){delete state.weeks[week.value];save();render()}}
+
+function rename(i,n){
+ let oldName=state.names[i];
+ n=n.trim().toUpperCase();
+ if(!n)return;
+
+ Object.values(state.weeks).forEach(w=>{
+  w.e=(w.e||[]).map(x=>x==oldName?n:x);
+  w.n=(w.n||[]).map(x=>x==oldName?n:x);
+
+  ["excludedE","excludedN"].forEach(k=>{
+   if(w[k]){
+    w[k]=w[k].map(arr=>(arr||[]).map(x=>x==oldName?n:x))
+   }
+  })
+ });
+
+ state.names[i]=n;
+ save();
+ render()
+}
+
+function addName(){
+ let n=newName.value.trim().toUpperCase();
+ if(!n||state.names.includes(n))return;
+
+ state.names.push(n);
+ newName.value="";
+ save();
+ render()
+}
+
+function del(i){
+ if(confirm("Διαγραφή ονόματος;")){
+  let n=state.names[i];
+  state.names.splice(i,1);
+
+  Object.values(state.weeks).forEach(w=>{
+   w.e=(w.e||[]).map(x=>x==n?"":x);
+   w.n=(w.n||[]).map(x=>x==n?"":x);
+
+   ["excludedE","excludedN"].forEach(k=>{
+    if(w[k]){
+     w[k]=w[k].map(arr=>(arr||[]).filter(x=>x!=n))
+    }
+   })
+  });
+
+  save();
+  render()
+ }
+}
+
+function thisWeek(){
+ week.value=ymd(monday(new Date()));
+ render()
+}
+
+function clearWeek(){
+ if(confirm("Καθαρισμός αυτής της εβδομάδας;")){
+  delete state.weeks[week.value];
+  save();
+  render()
+ }
+}
+
 week.onchange=render;
 
 function makeImage(){
- let w=W(),days=["ΔΕΥΤΕΡΑ","ΤΡΙΤΗ","ΤΕΤΑΡΤΗ","ΠΕΜΠΤΗ","ΠΑΡΑΣΚΕΥΗ","ΣΑΒΒΑΤΟ","ΚΥΡΙΑΚΗ"];
- let b=new Date(week.value+"T12:00"),ds=[];for(let i=0;i<7;i++){let x=new Date(b);x.setDate(b.getDate()+i);ds.push(fmt(x))}
- let c=document.createElement("canvas"),ctx=c.getContext("2d"),WID=1400,L=200,C=(WID-L)/7,H=430;c.width=WID*2;c.height=H*2;ctx.scale(2,2);
- ctx.fillStyle="white";ctx.fillRect(0,0,WID,H);
- function cell(x,y,ww,hh,color,t,bold=false){ctx.fillStyle=color;ctx.fillRect(x,y,ww,hh);ctx.strokeStyle="#777";ctx.strokeRect(x,y,ww,hh);ctx.fillStyle="#111";ctx.font=(bold?"bold ":"")+"20px Arial";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(t||"—",x+ww/2,y+hh/2)}
- ctx.fillStyle="#1f4e78";ctx.fillRect(0,0,WID,70);ctx.fillStyle="white";ctx.font="bold 30px Arial";ctx.textAlign="center";ctx.fillText("ΕΒΔΟΜΑΔΙΑΙΟ ΠΡΟΓΡΑΜΜΑ ΒΑΡΔΙΩΝ",WID/2,43);
- cell(0,70,L,60,"#fff2cc","Βάρδιες",true);days.forEach((x,i)=>cell(L+i*C,70,C,60,"#fff2cc",x,true));
- cell(0,130,L,55,"#e2f0d9","Ημερομηνία",true);ds.forEach((x,i)=>cell(L+i*C,130,C,55,"#e2f0d9",x,true));
- cell(0,185,L,80,"#fce4d6","18:00–00:00",true);w.e.forEach((x,i)=>cell(L+i*C,185,C,80,"#fce4d6",x));
- cell(0,265,L,80,"#fce4d6","00:00–06:00",true);w.n.forEach((x,i)=>cell(L+i*C,265,C,80,"#fce4d6",x));
- cell(0,345,L,70,"#d9eaf7","Σημειώσεις",true);cell(L,345,WID-L,70,"white",w.notes||"");
- c.toBlob(b=>{blob=b;if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(b);img.src=url;preview.style.display="block"},"image/png")
+ let w=W();
+ let days=["ΔΕΥΤΕΡΑ","ΤΡΙΤΗ","ΤΕΤΑΡΤΗ","ΠΕΜΠΤΗ","ΠΑΡΑΣΚΕΥΗ","ΣΑΒΒΑΤΟ","ΚΥΡΙΑΚΗ"];
+
+ let b=new Date(week.value+"T12:00"),ds=[];
+ for(let i=0;i<7;i++){
+  let x=new Date(b);
+  x.setDate(b.getDate()+i);
+  ds.push(fmt(x))
+ }
+
+ let c=document.createElement("canvas");
+ let ctx=c.getContext("2d");
+ let WID=1400,L=200,C=(WID-L)/7,H=430;
+
+ c.width=WID*2;
+ c.height=H*2;
+ ctx.scale(2,2);
+
+ ctx.fillStyle="white";
+ ctx.fillRect(0,0,WID,H);
+
+ function cell(x,y,ww,hh,color,t,bold=false){
+  ctx.fillStyle=color;
+  ctx.fillRect(x,y,ww,hh);
+  ctx.strokeStyle="#777";
+  ctx.strokeRect(x,y,ww,hh);
+  ctx.fillStyle="#111";
+  ctx.font=(bold?"bold ":"")+"20px Arial";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  ctx.fillText(t||"—",x+ww/2,y+hh/2)
+ }
+
+ ctx.fillStyle="#1f4e78";
+ ctx.fillRect(0,0,WID,70);
+ ctx.fillStyle="white";
+ ctx.font="bold 30px Arial";
+ ctx.textAlign="center";
+ ctx.fillText("ΕΒΔΟΜΑΔΙΑΙΟ ΠΡΟΓΡΑΜΜΑ ΒΑΡΔΙΩΝ",WID/2,43);
+
+ cell(0,70,L,60,"#fff2cc","Βάρδιες",true);
+ days.forEach((x,i)=>cell(L+i*C,70,C,60,"#fff2cc",x,true));
+
+ cell(0,130,L,55,"#e2f0d9","Ημερομηνία",true);
+ ds.forEach((x,i)=>cell(L+i*C,130,C,55,"#e2f0d9",x,true));
+
+ cell(0,185,L,80,"#fce4d6","18:00–00:00",true);
+ w.e.forEach((x,i)=>cell(L+i*C,185,C,80,"#fce4d6",x));
+
+ cell(0,265,L,80,"#fce4d6","00:00–06:00",true);
+ w.n.forEach((x,i)=>cell(L+i*C,265,C,80,"#fce4d6",x));
+
+ cell(0,345,L,70,"#d9eaf7","Σημειώσεις",true);
+ cell(L,345,WID-L,70,"white",w.notes||"");
+
+ c.toBlob(b=>{
+  blob=b;
+
+  if(url)URL.revokeObjectURL(url);
+  url=URL.createObjectURL(b);
+
+  img.src=url;
+  preview.style.display="block"
+ },"image/png")
 }
-function closePreview(){preview.style.display="none"}
-function downloadImage(){let a=document.createElement("a");a.href=url;a.download="programma-"+week.value+".png";a.click()}
+
+function closePreview(){
+ preview.style.display="none"
+}
+
+function downloadImage(){
+ let a=document.createElement("a");
+ a.href=url;
+ a.download="programma-"+week.value+".png";
+ a.click()
+}
+
 async function shareImage(){
- let f=new File([blob],"programma-"+week.value+".png",{type:"image/png"});
- if(navigator.share&&navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({files:[f],title:"Πρόγραμμα Βαρδιών"});
- else downloadImage()
+ let f=new File(
+  [blob],
+  "programma-"+week.value+".png",
+  {type:"image/png"}
+ );
+
+ if(navigator.share&&navigator.canShare&&navigator.canShare({files:[f]})){
+  await navigator.share({
+   files:[f],
+   title:"Πρόγραμμα Βαρδιών"
+  });
+ }else{
+  downloadImage()
+ }
 }
+
+save();
 render();
 </script>
 </body>
