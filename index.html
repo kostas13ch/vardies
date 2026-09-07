@@ -20,24 +20,21 @@
 </div>
 
 <section id="entry" class="panel active">
-<div class="card">
-<div class="controls">
-<b>Δευτέρα εβδομάδας:</b>
-<input id="week" type="date">
-<button onclick="thisWeek()" class="gray">Τρέχουσα εβδομάδα</button>
-<button onclick="addShift()" class="green">➕ Προσθήκη βάρδιας</button>
-<button onclick="saveNow()">💾 Αποθήκευση καταχώρησης</button>
+<div class="card"><div class="controls">
+<b>Δευτέρα εβδομάδας:</b><input id="week" type="date">
+<button id="thisWeekBtn" class="gray">Τρέχουσα εβδομάδα</button>
+<button id="addShiftBtn" class="green">➕ Προσθήκη βάρδιας</button>
+<button id="saveBtn">💾 Αποθήκευση καταχώρησης</button>
 <span id="saveMsg" class="small"></span>
-</div>
-</div>
+</div></div>
 
 <div class="card scroll">
 <table>
 <thead>
 <tr>
 <th>Βάρδιες</th>
-<th>ΔΕΥΤΕΡΑ</th><th>ΤΡΙΤΗ</th><th>ΤΕΤΑΡΤΗ</th><th>ΠΕΜΠΤΗ</th>
-<th>ΠΑΡΑΣΚΕΥΗ</th><th>ΣΑΒΒΑΤΟ</th><th>ΚΥΡΙΑΚΗ</th>
+<th>ΔΕΥΤΕΡΑ</th><th>ΤΡΙΤΗ</th><th>ΤΕΤΑΡΤΗ</th>
+<th>ΠΕΜΠΤΗ</th><th>ΠΑΡΑΣΚΕΥΗ</th><th>ΣΑΒΒΑΤΟ</th><th>ΚΥΡΙΑΚΗ</th>
 </tr>
 </thead>
 <tbody id="scheduleBody"></tbody>
@@ -49,7 +46,7 @@
 <div id="people" class="grid"></div>
 <div class="controls" style="margin-top:12px">
 <input id="newName" placeholder="Νέο όνομα">
-<button onclick="addName()">Προσθήκη</button>
+<button id="addNameBtn">Προσθήκη</button>
 </div>
 <p class="small">Οι βοηθητικές γραμμές είναι μόνο για επιλογή και δεν εμφανίζονται στην τελική εικόνα.</p>
 </div>
@@ -60,16 +57,17 @@
 <div class="controls">
 <b>Εβδομάδα:</b>
 <span id="imageWeekLabel"></span>
-<button onclick="makeImage()">📷 Δημιουργία εικόνας</button>
+<button id="makeImageBtn">📷 Δημιουργία εικόνας</button>
 </div>
 </div>
+
 <div class="card preview-table">
 <table>
 <thead>
 <tr>
 <th>Βάρδιες</th>
-<th>ΔΕΥΤΕΡΑ</th><th>ΤΡΙΤΗ</th><th>ΤΕΤΑΡΤΗ</th><th>ΠΕΜΠΤΗ</th>
-<th>ΠΑΡΑΣΚΕΥΗ</th><th>ΣΑΒΒΑΤΟ</th><th>ΚΥΡΙΑΚΗ</th>
+<th>ΔΕΥΤΕΡΑ</th><th>ΤΡΙΤΗ</th><th>ΤΕΤΑΡΤΗ</th>
+<th>ΠΕΜΠΤΗ</th><th>ΠΑΡΑΣΚΕΥΗ</th><th>ΣΑΒΒΑΤΟ</th><th>ΚΥΡΙΑΚΗ</th>
 </tr>
 </thead>
 <tbody id="cleanBody"></tbody>
@@ -83,7 +81,7 @@
 <div class="controls">
 <b>Από:</b><input id="statsFrom" type="date">
 <b>Έως:</b><input id="statsTo" type="date">
-<button onclick="calculateStats()">Υπολογισμός</button>
+<button id="statsBtn">Υπολογισμός</button>
 </div>
 <div id="statsResult" style="margin-top:14px"></div>
 </div>
@@ -98,8 +96,8 @@
 <div class="card">
 <h2>💾 Αντίγραφο ασφαλείας</h2>
 <div class="controls">
-<button onclick="backupData()">Αποθήκευση Backup</button>
-<button onclick="restoreFile.click()" class="gray">Επαναφορά Backup</button>
+<button id="backupBtn">Αποθήκευση Backup</button>
+<button id="restoreBtn" class="gray">Επαναφορά Backup</button>
 <input id="restoreFile" type="file" accept=".json,application/json" style="display:none">
 </div>
 <p class="small">Το backup περιέχει όλα τα ονόματα, όλες τις εβδομάδες, τις πρόσθετες βάρδιες και τους αποκλεισμούς.</p>
@@ -112,20 +110,21 @@
 <h3>Εικόνα προγράμματος</h3>
 <img id="previewImg">
 <div class="controls" style="margin-top:10px">
-<button onclick="shareImage()">Κοινοποίηση / Αποθήκευση</button>
-<button onclick="downloadImage()" class="gray">Λήψη PNG</button>
-<button onclick="closePreview()" class="gray">Κλείσιμο</button>
+<button id="shareBtn">Κοινοποίηση / Αποθήκευση</button>
+<button id="downloadBtn" class="gray">Λήψη PNG</button>
+<button id="closePreviewBtn" class="gray">Κλείσιμο</button>
 </div>
 </div>
 </div>
 
 <script>
-const KEY="vardies_v4";
+const KEY='vardies_v5';
 let blob=null,imageUrl=null;
 
-const pad=n=>String(n).padStart(2,"0");
-const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
-const fmt=d=>pad(d.getDate())+"/"+pad(d.getMonth()+1);
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const fmt=d=>pad(d.getDate())+'/'+pad(d.getMonth()+1);
 
 function monday(date){
  let d=new Date(date);
@@ -135,73 +134,88 @@ function monday(date){
  return d;
 }
 
+function canonicalWeekKey(value){
+ if(!value)return ymd(monday(new Date()));
+ return ymd(monday(new Date(value+'T12:00:00')));
+}
+
 function makeId(){
- return "s"+Date.now()+"_"+Math.floor(Math.random()*100000);
+ return 's'+Date.now()+'_'+Math.floor(Math.random()*100000);
 }
 
 function baseShift(id,label){
  return{
   id,label,fixed:true,
-  assignments:Array(7).fill(""),
+  assignments:Array(7).fill(''),
   excluded:Array.from({length:7},()=>[])
  };
 }
 
 function defaultWeek(){
  return{
-  notes:"",
+  notes:'',
   shifts:[
-   baseShift("base_e","18:00–00:00"),
-   baseShift("base_n","00:00–06:00")
+   baseShift('base_e','18:00–00:00'),
+   baseShift('base_n','00:00–06:00')
   ]
  };
 }
 
 function normalizeWeek(w){
- let out={notes:w?.notes||"",shifts:[]};
+ const out={notes:w?.notes||'',shifts:[]};
 
  if(Array.isArray(w?.shifts)){
   out.shifts=w.shifts.map(s=>({
    id:s.id||makeId(),
-   label:s.label||"Βάρδια",
+   label:s.label||'Βάρδια',
    fixed:!!s.fixed,
-   assignments:Array.from({length:7},(_,i)=>s.assignments?.[i]||""),
-   excluded:Array.from({length:7},(_,i)=>
-    Array.isArray(s.excluded?.[i])?[...s.excluded[i]]:[]
+   assignments:Array.from({length:7},(_,i)=>s.assignments?.[i]||''),
+   excluded:Array.from(
+    {length:7},
+    (_,i)=>Array.isArray(s.excluded?.[i])?[...s.excluded[i]]:[]
    )
   }));
  }else{
   out.shifts=[
    {
-    id:"base_e",label:"18:00–00:00",fixed:true,
-    assignments:Array.from({length:7},(_,i)=>w?.e?.[i]||""),
-    excluded:Array.from({length:7},(_,i)=>
-     Array.isArray(w?.excludedE?.[i])?[...w.excludedE[i]]:[]
+    id:'base_e',
+    label:'18:00–00:00',
+    fixed:true,
+    assignments:Array.from({length:7},(_,i)=>w?.e?.[i]||''),
+    excluded:Array.from(
+     {length:7},
+     (_,i)=>Array.isArray(w?.excludedE?.[i])?[...w.excludedE[i]]:[]
     )
    },
    {
-    id:"base_n",label:"00:00–06:00",fixed:true,
-    assignments:Array.from({length:7},(_,i)=>w?.n?.[i]||""),
-    excluded:Array.from({length:7},(_,i)=>
-     Array.isArray(w?.excludedN?.[i])?[...w.excludedN[i]]:[]
+    id:'base_n',
+    label:'00:00–06:00',
+    fixed:true,
+    assignments:Array.from({length:7},(_,i)=>w?.n?.[i]||''),
+    excluded:Array.from(
+     {length:7},
+     (_,i)=>Array.isArray(w?.excludedN?.[i])?[...w.excludedN[i]]:[]
     )
    }
   ];
  }
 
+ if(!out.shifts.length)return defaultWeek();
+
  return out;
 }
 
 function mergeWeek(a,b){
- a=normalizeWeek(a||defaultWeek());
- b=normalizeWeek(b||defaultWeek());
+ const out=normalizeWeek(a||defaultWeek());
+ const incoming=normalizeWeek(b||defaultWeek());
 
- let out=normalizeWeek(a);
+ if(incoming.notes&&!out.notes)
+  out.notes=incoming.notes;
 
- if(b.notes) out.notes=b.notes;
-
- for(const bs of b.shifts){
-  let os=out.shifts.find(x=>x.id===bs.id||x.label===bs.label);
+ for(const bs of incoming.shifts){
+  let os=out.shifts.find(
+   x=>x.id===bs.id||x.label===bs.label
+  );
 
   if(!os){
    out.shifts.push(bs);
@@ -209,7 +223,8 @@ function mergeWeek(a,b){
   }
 
   for(let i=0;i<7;i++){
-   if(bs.assignments[i]) os.assignments[i]=bs.assignments[i];
+   if(!os.assignments[i]&&bs.assignments[i])
+    os.assignments[i]=bs.assignments[i];
 
    os.excluded[i]=[
     ...new Set([
@@ -226,28 +241,72 @@ function mergeWeek(a,b){
 }
 
 function loadState(){
- let v4=JSON.parse(localStorage.getItem(KEY)||"null");
- if(v4) return v4;
+ const existing=JSON.parse(
+  localStorage.getItem(KEY)||'null'
+ );
 
- let result={names:[],weeks:{},lastWeek:""};
+ if(
+  existing&&
+  Array.isArray(existing.names)&&
+  existing.weeks
+ ){
+  return existing;
+ }
 
- for(const k of ["vardies_v1","vardies_v2","vardies_v3"]){
-  let src=JSON.parse(localStorage.getItem(k)||"null");
-  if(!src) continue;
+ const result={
+  names:[],
+  weeks:{},
+  lastWeek:''
+ };
+
+ for(
+  const k of [
+   'vardies_v1',
+   'vardies_v2',
+   'vardies_v3',
+   'vardies_v4'
+  ]
+ ){
+  let src=null;
+
+  try{
+   src=JSON.parse(
+    localStorage.getItem(k)||'null'
+   );
+  }catch{}
+
+  if(!src)continue;
 
   for(const n of src.names||[]){
-   if(!result.names.includes(n)) result.names.push(n);
+   if(!result.names.includes(n))
+    result.names.push(n);
   }
 
-  for(const [wk,w] of Object.entries(src.weeks||{})){
-   result.weeks[wk]=result.weeks[wk]
-    ? mergeWeek(result.weeks[wk],w)
-    : normalizeWeek(w);
+  for(
+   const [rawKey,w]
+   of Object.entries(src.weeks||{})
+  ){
+   const wk=canonicalWeekKey(rawKey);
+
+   result.weeks[wk]=
+    result.weeks[wk]
+     ?mergeWeek(result.weeks[wk],w)
+     :normalizeWeek(w);
   }
+
+  if(src.lastWeek)
+   result.lastWeek=
+    canonicalWeekKey(src.lastWeek);
  }
 
  if(!result.names.length){
-  result.names=["ΔΗΜΗΤΡΗΣ","ΧΡΗΣΤΟΣ","ΚΩΣΤΑΣ","ΣΤΕΦΑΝΟΣ","ΝΙΚΟΣ"];
+  result.names=[
+   'ΔΗΜΗΤΡΗΣ',
+   'ΧΡΗΣΤΟΣ',
+   'ΚΩΣΤΑΣ',
+   'ΣΤΕΦΑΝΟΣ',
+   'ΝΙΚΟΣ'
+  ];
  }
 
  return result;
@@ -255,27 +314,79 @@ function loadState(){
 
 let state=loadState();
 
-function save(){
- state.lastWeek=week.value;
- localStorage.setItem(KEY,JSON.stringify(state));
+let activeWeekKey=
+ canonicalWeekKey(
+  state.lastWeek||
+  new Date().toISOString().slice(0,10)
+ );
+
+function persist(){
+ state.lastWeek=activeWeekKey;
+ localStorage.setItem(
+  KEY,
+  JSON.stringify(state)
+ );
 }
 
-week.value=state.lastWeek||ymd(monday(new Date()));
+function ensureWeek(key=activeWeekKey){
+ key=canonicalWeekKey(key);
 
-function W(){
- let k=week.value;
+ if(!state.weeks[key])
+  state.weeks[key]=defaultWeek();
 
- if(!state.weeks[k]){
-  state.weeks[k]=defaultWeek();
+ state.weeks[key]=
+  normalizeWeek(state.weeks[key]);
+
+ return state.weeks[key];
+}
+
+function commitVisibleWeek(){
+ const w=ensureWeek(activeWeekKey);
+
+ const selects=[
+  ...document.querySelectorAll(
+   '#scheduleBody select[data-shift-id]'
+  )
+ ];
+
+ if(selects.length){
+  for(const sel of selects){
+   const s=w.shifts.find(
+    x=>x.id===sel.dataset.shiftId
+   );
+
+   if(s)
+    s.assignments[
+     Number(sel.dataset.day)
+    ]=sel.value||'';
+  }
+
+  const notes=$('notes');
+
+  if(notes)
+   w.notes=notes.value||'';
  }
 
- state.weeks[k]=normalizeWeek(state.weeks[k]);
-
- return state.weeks[k];
+ persist();
 }
 
-function getWeekDates(){
- let base=new Date(week.value+"T12:00:00");
+function switchWeek(rawValue){
+ commitVisibleWeek();
+
+ activeWeekKey=
+  canonicalWeekKey(rawValue);
+
+ $('week').value=activeWeekKey;
+
+ ensureWeek(activeWeekKey);
+ persist();
+ renderAll();
+}
+
+function getWeekDates(key=activeWeekKey){
+ let base=
+  new Date(key+'T12:00:00');
+
  let arr=[];
 
  for(let i=0;i<7;i++){
@@ -287,62 +398,86 @@ function getWeekDates(){
  return arr;
 }
 
-function render(){
+function renderAll(){
+ $('week').value=activeWeekKey;
  renderSchedule();
  renderPeople();
  renderClean();
  renderWeeks();
- save();
 }
 
 function renderSchedule(){
- let body=scheduleBody;
- body.innerHTML="";
+ const body=$('scheduleBody');
+ body.innerHTML='';
 
- let dates=getWeekDates();
+ const dates=getWeekDates();
 
- let dr=document.createElement("tr");
- dr.className="date";
- dr.innerHTML="<td>Ημερομηνία</td>"+
-  dates.map(d=>`<td>${fmt(d)}</td>`).join("");
+ const dr=document.createElement('tr');
+ dr.className='date';
+
+ dr.innerHTML=
+  '<td>Ημερομηνία</td>'+
+  dates.map(
+   d=>`<td>${fmt(d)}</td>`
+  ).join('');
 
  body.appendChild(dr);
 
- let w=W();
+ const w=ensureWeek();
 
  for(const shift of w.shifts){
-  let row=document.createElement("tr");
-  row.className="shift";
+  const row=
+   document.createElement('tr');
 
-  let first=document.createElement("td");
-  first.className="shift-label";
+  row.className='shift';
+
+  const first=
+   document.createElement('td');
+
+  first.className='shift-label';
 
   first.innerHTML=
    `<div>${shift.label}</div>`+
-   (!shift.fixed
-    ? `<button class="red"
-       style="font-size:11px;padding:4px 6px;margin-top:5px"
-       onclick="deleteShift('${shift.id}')">Διαγραφή</button>`
-    : "");
+   (
+    !shift.fixed
+     ?`<button class="red"
+        style="font-size:11px;padding:4px 6px;margin-top:5px"
+        data-delete-shift="${shift.id}">
+        Διαγραφή
+       </button>`
+     :''
+   );
 
   row.appendChild(first);
 
   for(let day=0;day<7;day++){
-   let td=document.createElement("td");
-   let sel=document.createElement("select");
+   const td=
+    document.createElement('td');
+
+   const sel=
+    document.createElement('select');
+
+   sel.dataset.shiftId=shift.id;
+   sel.dataset.day=day;
 
    sel.innerHTML=
     '<option value="">—</option>'+
-    state.names.map(n=>`<option>${n}</option>`).join("");
+    state.names.map(
+     n=>`<option value="${n}">${n}</option>`
+    ).join('');
 
-   sel.value=shift.assignments[day]||"";
+   sel.value=
+    shift.assignments[day]||'';
 
-   sel.onchange=()=>{
-    shift.assignments[day]=sel.value;
-    save();
-    renderPeople();
-    renderClean();
-   };
+   sel.addEventListener(
+    'change',
+    ()=>{
+     shift.assignments[day]=sel.value;
+     persist();
+     renderPeople();
+     renderClean();
+    }
+   );
 
    td.appendChild(sel);
    row.appendChild(td);
@@ -350,74 +485,98 @@ function renderSchedule(){
 
   body.appendChild(row);
 
-  let helper=document.createElement("tr");
-  helper.className="helper";
+  const helper=
+   document.createElement('tr');
+
+  helper.className='helper';
+
   helper.innerHTML=
-   `<td class="helper-label">Υποψήφιοι<br>${shift.label}</td>`;
+   `<td class="helper-label">
+    Υποψήφιοι<br>${shift.label}
+    </td>`;
 
   for(let day=0;day<7;day++){
-   let td=document.createElement("td");
-   td.appendChild(makeCandidateBox(shift,day));
+   const td=
+    document.createElement('td');
+
+   td.appendChild(
+    makeCandidateBox(shift,day)
+   );
+
    helper.appendChild(td);
   }
 
   body.appendChild(helper);
  }
 
- let nr=document.createElement("tr");
+ const nr=
+  document.createElement('tr');
+
  nr.innerHTML=
   '<td><b>Σημειώσεις</b></td>'+
-  '<td colspan="7"><textarea id="notes" rows="3" style="width:100%"></textarea></td>';
+  '<td colspan="7">'+
+  '<textarea id="notes" rows="3" style="width:100%"></textarea>'+
+  '</td>';
 
  body.appendChild(nr);
 
- notes.value=w.notes||"";
+ $('notes').value=w.notes||'';
 
- notes.oninput=()=>{
-  w.notes=notes.value;
-  save();
-  renderClean();
- };
-}
+ $('notes').addEventListener(
+  'input',
+  ()=>{
+   w.notes=$('notes').value;
+   persist();
+   renderClean();
+  }
+ );
 
-function makeCandidateBox(shift,day){
- let wrap=document.createElement("div");
- wrap.className="candidates";
+ body
+  .querySelectorAll('[data-delete-shift]')
+  .forEach(
+   b=>b.onclick=
+    ()=>deleteShift(
+     b.dataset.deleteShift
+    )
+  );
+}function makeCandidateBox(shift,day){
+ const wrap=document.createElement('div');
+ wrap.className='candidates';
 
- let ex=shift.excluded[day]||[];
+ const excluded=shift.excluded[day]||[];
 
  for(const name of state.names){
-  let div=document.createElement("div");
+  const div=document.createElement('div');
 
   div.className=
-   "person"+
-   (ex.includes(name)?" off":"");
+   'person'+
+   (excluded.includes(name)?' off':'');
 
   div.textContent=name;
 
   div.onclick=()=>{
-   let arr=shift.excluded[day]||[];
-   let i=arr.indexOf(name);
+   const arr=shift.excluded[day]||[];
+   const i=arr.indexOf(name);
 
-   if(i>=0) arr.splice(i,1);
+   if(i>=0)arr.splice(i,1);
    else arr.push(name);
 
    shift.excluded[day]=arr;
 
-   save();
+   persist();
    renderSchedule();
   };
 
   wrap.appendChild(div);
  }
 
- let reset=document.createElement("button");
- reset.className="reset";
- reset.textContent="Επαναφορά";
+ const reset=document.createElement('button');
+ reset.className='reset';
+ reset.textContent='Επαναφορά';
 
  reset.onclick=()=>{
   shift.excluded[day]=[];
-  save();
+  persist();
   renderSchedule();
  };
 
@@ -427,8 +586,8 @@ function makeCandidateBox(shift,day){
 }
 
 function renderPeople(){
- let p=people;
- let w=W();
+ const p=$('people');
+ const w=ensureWeek();
 
  p.innerHTML=
   '<div class="head">Όνομα</div>'+
@@ -438,240 +597,326 @@ function renderPeople(){
  state.names.forEach((name,index)=>{
   let count=0;
 
-  w.shifts.forEach(s=>
-   count+=s.assignments.filter(x=>x===name).length
-  );
+  for(const s of w.shifts){
+   count+=s.assignments.filter(
+    x=>x===name
+   ).length;
+  }
 
-  let input=document.createElement("input");
+  const input=
+   document.createElement('input');
+
   input.value=name;
-  input.onchange=()=>rename(index,input.value);
 
-  let total=document.createElement("b");
-  total.style.textAlign="center";
+  input.onchange=()=>{
+   rename(index,input.value);
+  };
+
+  const total=
+   document.createElement('b');
+
+  total.style.textAlign='center';
   total.textContent=count;
 
-  let delBtn=document.createElement("button");
-  delBtn.className="gray";
-  delBtn.textContent="Διαγρ.";
-  delBtn.onclick=()=>deleteName(index);
+  const delBtn=
+   document.createElement('button');
 
-  p.append(input,total,delBtn);
+  delBtn.className='gray';
+  delBtn.textContent='Διαγρ.';
+
+  delBtn.onclick=()=>{
+   deleteName(index);
+  };
+
+  p.append(
+   input,
+   total,
+   delBtn
+  );
  });
 }
 
 function renderClean(){
- let body=cleanBody;
- body.innerHTML="";
+ const body=$('cleanBody');
+ body.innerHTML='';
 
- let dates=getWeekDates();
+ const dates=getWeekDates();
+ const w=ensureWeek();
 
- let dr=document.createElement("tr");
- dr.className="date";
+ const dr=document.createElement('tr');
+ dr.className='date';
 
  dr.innerHTML=
-  "<td>Ημερομηνία</td>"+
-  dates.map(d=>`<td>${fmt(d)}</td>`).join("");
+  '<td>Ημερομηνία</td>'+
+  dates.map(
+   d=>`<td>${fmt(d)}</td>`
+  ).join('');
 
  body.appendChild(dr);
 
- let w=W();
-
  for(const shift of w.shifts){
-  let tr=document.createElement("tr");
-  tr.className="shift";
+  const tr=document.createElement('tr');
+  tr.className='shift';
 
   tr.innerHTML=
    `<td class="shift-label">${shift.label}</td>`+
-   shift.assignments.map(x=>`<td>${x||"—"}</td>`).join("");
+   shift.assignments
+    .map(
+     x=>`<td>${x||'—'}</td>`
+    )
+    .join('');
 
   body.appendChild(tr);
  }
 
- let nr=document.createElement("tr");
+ const nr=document.createElement('tr');
 
  nr.innerHTML=
   `<td><b>Σημειώσεις</b></td>
-   <td colspan="7">${w.notes||""}</td>`;
+   <td colspan="7">${w.notes||''}</td>`;
 
  body.appendChild(nr);
 
- imageWeekLabel.textContent=
-  fmt(getWeekDates()[0])+" – "+fmt(getWeekDates()[6]);
+ $('imageWeekLabel').textContent=
+  fmt(dates[0])+' – '+fmt(dates[6]);
 }
 
 function renderWeeks(){
- let keys=Object.keys(state.weeks).sort();
+ const list=$('weeksList');
+ const keys=Object.keys(state.weeks).sort();
 
- weeksList.innerHTML=
+ list.innerHTML=
   keys.length
-   ? ""
-   : "<div class='small'>Δεν υπάρχουν αποθηκευμένες εβδομάδες.</div>";
+   ?''
+   :"<div class='small'>Δεν υπάρχουν αποθηκευμένες εβδομάδες.</div>";
 
  for(const k of keys){
-  let d=new Date(k+"T12:00:00");
-  let e=new Date(d);
+  const d=new Date(k+'T12:00:00');
+  const e=new Date(d);
+
   e.setDate(d.getDate()+6);
 
-  let item=document.createElement("div");
-  item.className="week-item";
+  const item=document.createElement('div');
+  item.className='week-item';
 
   item.innerHTML=
    `<span><b>${fmt(d)} – ${fmt(e)}</b></span>
     <button class="gray">Άνοιγμα</button>`;
 
-  item.querySelector("button").onclick=()=>{
-   week.value=k;
-   showTab("entry");
-   render();
+  item.querySelector('button').onclick=()=>{
+   switchWeek(k);
+   showTab('entry');
   };
 
-  weeksList.appendChild(item);
+  list.appendChild(item);
  }
 }
 
 function addShift(){
+ commitVisibleWeek();
+
  let label=prompt(
-  "Γράψε το ωράριο ή την ονομασία της νέας βάρδιας:",
-  "06:00–12:00"
+  'Γράψε το ωράριο ή την ονομασία της νέας βάρδιας:',
+  '06:00–12:00'
  );
 
- if(!label||!label.trim()) return;
+ if(!label||!label.trim())return;
 
- W().shifts.push({
+ const w=ensureWeek();
+
+ w.shifts.push({
   id:makeId(),
   label:label.trim(),
   fixed:false,
-  assignments:Array(7).fill(""),
+  assignments:Array(7).fill(''),
   excluded:Array.from({length:7},()=>[])
  });
 
- save();
- render();
+ persist();
+ renderAll();
 }
 
 function deleteShift(id){
- let w=W();
- let s=w.shifts.find(x=>x.id===id);
+ commitVisibleWeek();
 
- if(!s||s.fixed) return;
+ const w=ensureWeek();
+ const s=w.shifts.find(x=>x.id===id);
 
- if(!confirm(`Να διαγραφεί η βάρδια "${s.label}" από αυτή την εβδομάδα;`))
-  return;
+ if(!s||s.fixed)return;
 
- w.shifts=w.shifts.filter(x=>x.id!==id);
+ if(
+  !confirm(
+   `Να διαγραφεί η βάρδια "${s.label}" από αυτή την εβδομάδα;`
+  )
+ )return;
 
- save();
- render();
+ w.shifts=
+  w.shifts.filter(
+   x=>x.id!==id
+  );
+
+ persist();
+ renderAll();
 }
 
 function rename(index,newName){
- let oldName=state.names[index];
+ commitVisibleWeek();
 
+ const oldName=state.names[index];
  newName=newName.trim().toUpperCase();
 
- if(!newName) return;
+ if(!newName)return;
 
- for(const w of Object.values(state.weeks)){
-  for(const s of normalizeWeek(w).shifts){
-   s.assignments=s.assignments.map(x=>x===oldName?newName:x);
-   s.excluded=s.excluded.map(arr=>
-    arr.map(x=>x===oldName?newName:x)
-   );
+ for(const key of Object.keys(state.weeks)){
+  const w=normalizeWeek(state.weeks[key]);
+
+  for(const s of w.shifts){
+   s.assignments=
+    s.assignments.map(
+     x=>x===oldName?newName:x
+    );
+
+   s.excluded=
+    s.excluded.map(
+     arr=>
+      arr.map(
+       x=>x===oldName?newName:x
+      )
+    );
   }
+
+  state.weeks[key]=w;
  }
 
  state.names[index]=newName;
 
- save();
- render();
+ persist();
+ renderAll();
 }
 
 function addName(){
- let name=newName.value.trim().toUpperCase();
+ const input=$('newName');
+ const name=input.value.trim().toUpperCase();
 
- if(!name||state.names.includes(name)) return;
+ if(!name)return;
+
+ if(state.names.includes(name)){
+  alert('Το όνομα υπάρχει ήδη.');
+  return;
+ }
 
  state.names.push(name);
- newName.value="";
+ input.value='';
 
- save();
- render();
+ persist();
+ renderAll();
 }
 
 function deleteName(index){
- let name=state.names[index];
+ commitVisibleWeek();
 
- if(!confirm(`Να διαγραφεί ο ${name};`))
-  return;
+ const name=state.names[index];
+
+ if(
+  !confirm(
+   `Να διαγραφεί ο ${name};`
+  )
+ )return;
 
  state.names.splice(index,1);
 
- for(const w of Object.values(state.weeks)){
-  for(const s of normalizeWeek(w).shifts){
-   s.assignments=s.assignments.map(x=>x===name?"":x);
-   s.excluded=s.excluded.map(arr=>
-    arr.filter(x=>x!==name)
-   );
+ for(const key of Object.keys(state.weeks)){
+  const w=normalizeWeek(state.weeks[key]);
+
+  for(const s of w.shifts){
+   s.assignments=
+    s.assignments.map(
+     x=>x===name?'':x
+    );
+
+   s.excluded=
+    s.excluded.map(
+     arr=>arr.filter(
+      x=>x!==name
+     )
+    );
   }
+
+  state.weeks[key]=w;
  }
 
- save();
- render();
+ persist();
+ renderAll();
 }
 
 function thisWeek(){
- week.value=ymd(monday(new Date()));
- render();
+ switchWeek(
+  ymd(
+   monday(new Date())
+  )
+ );
 }
 
-week.onchange=()=>render();
-
 function saveNow(){
- save();
- saveMsg.textContent="Αποθηκεύτηκε ✓";
+ commitVisibleWeek();
+
+ $('saveMsg').textContent=
+  'Αποθηκεύτηκε ✓';
 
  setTimeout(()=>{
-  saveMsg.textContent="";
+  $('saveMsg').textContent='';
  },2000);
 }
 
 function calculateStats(){
- let fv=statsFrom.value;
- let tv=statsTo.value;
+ commitVisibleWeek();
 
- if(!fv||!tv)
-  return alert("Επίλεξε ημερομηνία από και έως.");
+ const fv=$('statsFrom').value;
+ const tv=$('statsTo').value;
 
- let from=new Date(fv+"T12:00:00");
- let to=new Date(tv+"T12:00:00");
+ if(!fv||!tv){
+  alert('Επίλεξε ημερομηνία από και έως.');
+  return;
+ }
 
- if(from>to)
-  return alert("Η ημερομηνία «Από» πρέπει να είναι πριν από την «Έως».");
+ const from=
+  new Date(fv+'T12:00:00');
 
- let totals={};
- let by={};
- let labels=new Set();
+ const to=
+  new Date(tv+'T12:00:00');
 
- state.names.forEach(n=>{
+ if(from>to){
+  alert('Η ημερομηνία «Από» πρέπει να είναι πριν από την «Έως».');
+  return;
+ }
+
+ const totals={};
+ const by={};
+ const labels=new Set();
+
+ for(const n of state.names){
   totals[n]=0;
   by[n]={};
- });
+ }
 
- for(let d=new Date(from);d<=to;d.setDate(d.getDate()+1)){
-  let day=new Date(d);
-  let wk=ymd(monday(day));
-  let w=state.weeks[wk];
+ for(
+  let d=new Date(from);
+  d<=to;
+  d.setDate(d.getDate()+1)
+ ){
+  const day=new Date(d);
+  const wk=ymd(monday(day));
+  const raw=state.weeks[wk];
 
-  if(!w) continue;
+  if(!raw)continue;
 
-  w=normalizeWeek(w);
-
-  let di=(day.getDay()+6)%7;
+  const w=normalizeWeek(raw);
+  const di=(day.getDay()+6)%7;
 
   for(const s of w.shifts){
-   let name=s.assignments[di]||"";
+   const name=s.assignments[di]||'';
 
-   if(!name) continue;
+   if(!name)continue;
 
    labels.add(s.label);
 
@@ -681,12 +926,15 @@ function calculateStats(){
    }
 
    totals[name]++;
-   by[name][s.label]=(by[name][s.label]||0)+1;
+
+   by[name][s.label]=
+    (by[name][s.label]||0)+1;
   }
  }
 
- let labs=[...labels];
- let names=[
+ const labs=[...labels];
+
+ const names=[
   ...new Set([
    ...state.names,
    ...Object.keys(totals)
@@ -697,207 +945,299 @@ function calculateStats(){
   '<div class="stats-wrap">'+
   '<table class="stats-table">'+
   '<thead><tr><th>Όνομα</th>'+
-  labs.map(l=>`<th>${l}</th>`).join("")+
+  labs.map(
+   l=>`<th>${l}</th>`
+  ).join('')+
   '<th>ΣΥΝΟΛΟ</th></tr></thead><tbody>';
 
  for(const n of names){
   html+=
    `<tr><td><b>${n}</b></td>`+
-   labs.map(l=>`<td>${by[n]?.[l]||0}</td>`).join("")+
+   labs.map(
+    l=>`<td>${by[n]?.[l]||0}</td>`
+   ).join('')+
    `<td class="total">${totals[n]||0}</td></tr>`;
  }
 
- html+="</tbody></table></div>";
+ html+='</tbody></table></div>';
 
- statsResult.innerHTML=html;
+ $('statsResult').innerHTML=html;
 }
 
 function backupData(){
- save();
+ commitVisibleWeek();
 
- let b=new Blob(
+ const b=new Blob(
   [JSON.stringify(state,null,2)],
-  {type:"application/json"}
+  {type:'application/json'}
  );
 
- let u=URL.createObjectURL(b);
- let a=document.createElement("a");
+ const u=URL.createObjectURL(b);
+ const a=document.createElement('a');
 
  a.href=u;
- a.download="vardies-backup-"+ymd(new Date())+".json";
+ a.download=
+  'vardies-backup-'+
+  ymd(new Date())+
+  '.json';
 
+ document.body.appendChild(a);
  a.click();
+ a.remove();
 
- setTimeout(()=>URL.revokeObjectURL(u),1000);
+ setTimeout(
+  ()=>URL.revokeObjectURL(u),
+  1000
+ );
 }
 
-restoreFile.onchange=e=>{
- let file=e.target.files?.[0];
+$('restoreFile').onchange=e=>{
+ const file=e.target.files?.[0];
 
- if(!file) return;
+ if(!file)return;
 
- let r=new FileReader();
+ const r=new FileReader();
 
  r.onload=()=>{
   try{
-   let data=JSON.parse(r.result);
+   const data=JSON.parse(r.result);
 
-   if(!data||!Array.isArray(data.names)||typeof data.weeks!=="object")
-    throw 0;
-
-   state={
-    names:data.names,
-    weeks:{},
-    lastWeek:data.lastWeek||week.value
-   };
-
-   for(const [k,w] of Object.entries(data.weeks||{})){
-    state.weeks[k]=normalizeWeek(w);
+   if(
+    !data||
+    !Array.isArray(data.names)||
+    typeof data.weeks!=='object'
+   ){
+    throw new Error();
    }
 
-   week.value=state.lastWeek;
+   const restored={
+    names:[...data.names],
+    weeks:{},
+    lastWeek:
+     canonicalWeekKey(
+      data.lastWeek||
+      activeWeekKey
+     )
+   };
 
-   save();
-   render();
+   for(
+    const [rawKey,w]
+    of Object.entries(
+     data.weeks||{}
+    )
+   ){
+    const wk=
+     canonicalWeekKey(rawKey);
 
-   alert("Το backup επαναφέρθηκε επιτυχώς.");
+    restored.weeks[wk]=
+     restored.weeks[wk]
+      ?mergeWeek(
+        restored.weeks[wk],
+        w
+       )
+      :normalizeWeek(w);
+   }
+
+   state=restored;
+   activeWeekKey=state.lastWeek;
+
+   persist();
+   renderAll();
+
+   alert(
+    'Το backup επαναφέρθηκε επιτυχώς.'
+   );
   }catch{
-   alert("Το αρχείο backup δεν είναι έγκυρο.");
+   alert(
+    'Το αρχείο backup δεν είναι έγκυρο.'
+   );
   }
  };
 
  r.readAsText(file);
- e.target.value="";
+ e.target.value='';
 };
 
 function makeImage(){
- let w=W();
- let dates=getWeekDates();
+ commitVisibleWeek();
 
- let days=[
-  "ΔΕΥΤΕΡΑ","ΤΡΙΤΗ","ΤΕΤΑΡΤΗ","ΠΕΜΠΤΗ",
-  "ΠΑΡΑΣΚΕΥΗ","ΣΑΒΒΑΤΟ","ΚΥΡΙΑΚΗ"
+ const w=ensureWeek();
+ const dates=getWeekDates();
+
+ const days=[
+  'ΔΕΥΤΕΡΑ',
+  'ΤΡΙΤΗ',
+  'ΤΕΤΑΡΤΗ',
+  'ΠΕΜΠΤΗ',
+  'ΠΑΡΑΣΚΕΥΗ',
+  'ΣΑΒΒΑΤΟ',
+  'ΚΥΡΙΑΚΗ'
  ];
 
- let WID=1400;
- let LEFT=200;
- let COL=(WID-LEFT)/7;
+ const WID=1400;
+ const LEFT=200;
+ const COL=(WID-LEFT)/7;
 
- let titleH=70;
- let headerH=60;
- let dateH=55;
- let shiftH=80;
- let noteH=70;
+ const titleH=70;
+ const headerH=60;
+ const dateH=55;
+ const shiftH=80;
+ const noteH=70;
 
- let H=
+ const H=
   titleH+
   headerH+
   dateH+
   shiftH*w.shifts.length+
   noteH;
 
- let c=document.createElement("canvas");
- let ctx=c.getContext("2d");
+ const c=
+  document.createElement('canvas');
+
+ const ctx=
+  c.getContext('2d');
 
  c.width=WID*2;
  c.height=H*2;
 
  ctx.scale(2,2);
 
- ctx.fillStyle="white";
+ ctx.fillStyle='white';
  ctx.fillRect(0,0,WID,H);
 
- function cell(x,y,ww,hh,color,text,bold=false){
+ function cell(
+  x,y,ww,hh,color,text,bold=false
+ ){
   ctx.fillStyle=color;
   ctx.fillRect(x,y,ww,hh);
 
-  ctx.strokeStyle="#777";
+  ctx.strokeStyle='#777';
   ctx.strokeRect(x,y,ww,hh);
 
-  ctx.fillStyle="#111";
-  ctx.font=(bold?"bold ":"")+"20px Arial";
+  ctx.fillStyle='#111';
+  ctx.font=
+   (bold?'bold ':'')+
+   '20px Arial';
 
-  ctx.textAlign="center";
-  ctx.textBaseline="middle";
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
 
-  let t=text||"—";
+  let t=text||'—';
 
-  while(ctx.measureText(t).width>ww-12&&t.length>3)
+  while(
+   ctx.measureText(t).width>
+   ww-12 &&
+   t.length>3
+  ){
    t=t.slice(0,-1);
+  }
 
   if(text&&t!==text)
-   t+="…";
+   t+='…';
 
-  ctx.fillText(t,x+ww/2,y+hh/2);
+  ctx.fillText(
+   t,
+   x+ww/2,
+   y+hh/2
+  );
  }
 
- ctx.fillStyle="#1f4e78";
- ctx.fillRect(0,0,WID,titleH);
+ ctx.fillStyle='#1f4e78';
+ ctx.fillRect(
+  0,0,WID,titleH
+ );
 
- ctx.fillStyle="white";
- ctx.font="bold 30px Arial";
- ctx.textAlign="center";
- ctx.textBaseline="middle";
+ ctx.fillStyle='white';
+ ctx.font='bold 30px Arial';
+ ctx.textAlign='center';
+ ctx.textBaseline='middle';
 
  ctx.fillText(
-  "ΕΒΔΟΜΑΔΙΑΙΟ ΠΡΟΓΡΑΜΜΑ ΒΑΡΔΙΩΝ",
+  'ΕΒΔΟΜΑΔΙΑΙΟ ΠΡΟΓΡΑΜΜΑ ΒΑΡΔΙΩΝ',
   WID/2,
   titleH/2
  );
 
  let y=titleH;
 
- cell(0,y,LEFT,headerH,"#fff2cc","Βάρδιες",true);
-
- days.forEach((d,i)=>
-  cell(
-   LEFT+i*COL,y,COL,headerH,
-   "#fff2cc",d,true
-  )
+ cell(
+  0,y,LEFT,headerH,
+  '#fff2cc',
+  'Βάρδιες',
+  true
  );
+
+ days.forEach((d,i)=>{
+  cell(
+   LEFT+i*COL,
+   y,
+   COL,
+   headerH,
+   '#fff2cc',
+   d,
+   true
+  );
+ });
 
  y+=headerH;
 
- cell(0,y,LEFT,dateH,"#e2f0d9","Ημερομηνία",true);
-
- dates.forEach((d,i)=>
-  cell(
-   LEFT+i*COL,y,COL,dateH,
-   "#e2f0d9",fmt(d),true
-  )
+ cell(
+  0,y,LEFT,dateH,
+  '#e2f0d9',
+  'Ημερομηνία',
+  true
  );
+
+ dates.forEach((d,i)=>{
+  cell(
+   LEFT+i*COL,
+   y,
+   COL,
+   dateH,
+   '#e2f0d9',
+   fmt(d),
+   true
+  );
+ });
 
  y+=dateH;
 
  for(const s of w.shifts){
   cell(
    0,y,LEFT,shiftH,
-   "#fce4d6",
+   '#fce4d6',
    s.label,
    true
   );
 
-  s.assignments.forEach((n,i)=>
+  s.assignments.forEach((n,i)=>{
    cell(
-    LEFT+i*COL,y,COL,shiftH,
-    "#fce4d6",n
-   )
-  );
+    LEFT+i*COL,
+    y,
+    COL,
+    shiftH,
+    '#fce4d6',
+    n
+   );
+  });
 
   y+=shiftH;
  }
 
  cell(
   0,y,LEFT,noteH,
-  "#d9eaf7",
-  "Σημειώσεις",
+  '#d9eaf7',
+  'Σημειώσεις',
   true
  );
 
  cell(
-  LEFT,y,WID-LEFT,noteH,
-  "white",
-  w.notes||""
+  LEFT,
+  y,
+  WID-LEFT,
+  noteH,
+  'white',
+  w.notes||''
  );
 
  c.toBlob(b=>{
@@ -906,35 +1246,42 @@ function makeImage(){
   if(imageUrl)
    URL.revokeObjectURL(imageUrl);
 
-  imageUrl=URL.createObjectURL(b);
+  imageUrl=
+   URL.createObjectURL(b);
 
-  previewImg.src=imageUrl;
-  previewModal.style.display="block";
- },"image/png");
+  $('previewImg').src=imageUrl;
+  $('previewModal').style.display='block';
+ },'image/png');
 }
 
 function closePreview(){
- previewModal.style.display="none";
+ $('previewModal').style.display='none';
 }
 
 function downloadImage(){
- if(!imageUrl) return;
+ if(!imageUrl)return;
 
- let a=document.createElement("a");
+ const a=
+  document.createElement('a');
 
  a.href=imageUrl;
- a.download="programma-"+week.value+".png";
+ a.download=
+  'programma-'+
+  activeWeekKey+
+  '.png';
 
  a.click();
 }
 
 async function shareImage(){
- if(!blob) return;
+ if(!blob)return;
 
- let f=new File(
+ const f=new File(
   [blob],
-  "programma-"+week.value+".png",
-  {type:"image/png"}
+  'programma-'+
+  activeWeekKey+
+  '.png',
+  {type:'image/png'}
  );
 
  if(
@@ -945,7 +1292,7 @@ async function shareImage(){
   try{
    await navigator.share({
     files:[f],
-    title:"Πρόγραμμα Βαρδιών"
+    title:'Πρόγραμμα Βαρδιών'
    });
   }catch{}
  }else{
@@ -954,37 +1301,91 @@ async function shareImage(){
 }
 
 function showTab(id){
- document.querySelectorAll(".panel").forEach(x=>
-  x.classList.remove("active")
- );
-
- document.querySelectorAll(".tab").forEach(x=>
-  x.classList.remove("active")
- );
-
- document.getElementById(id).classList.add("active");
+ document
+  .querySelectorAll('.panel')
+  .forEach(
+   x=>x.classList.remove('active')
+  );
 
  document
-  .querySelector(`.tab[data-tab="${id}"]`)
-  .classList.add("active");
+  .querySelectorAll('.tab')
+  .forEach(
+   x=>x.classList.remove('active')
+  );
 
- if(id==="image") renderClean();
- if(id==="data") renderWeeks();
+ $(id).classList.add('active');
+
+ document
+  .querySelector(
+   `.tab[data-tab="${id}"]`
+  )
+  .classList.add('active');
+
+ if(id==='image')
+  renderClean();
+
+ if(id==='data')
+  renderWeeks();
 }
 
-document.querySelectorAll(".tab").forEach(b=>
- b.onclick=()=>showTab(b.dataset.tab)
+document
+ .querySelectorAll('.tab')
+ .forEach(
+  b=>b.onclick=
+   ()=>showTab(b.dataset.tab)
+ );
+
+$('week').addEventListener(
+ 'change',
+ ()=>{
+  switchWeek(
+   $('week').value
+  );
+ }
 );
 
-statsFrom.value=ymd(monday(new Date()));
+$('thisWeekBtn').onclick=thisWeek;
+$('addShiftBtn').onclick=addShift;
+$('saveBtn').onclick=saveNow;
+$('addNameBtn').onclick=addName;
+$('makeImageBtn').onclick=makeImage;
+$('statsBtn').onclick=calculateStats;
+$('backupBtn').onclick=backupData;
 
-let end=new Date(monday(new Date()));
-end.setDate(end.getDate()+6);
+$('restoreBtn').onclick=()=>{
+ $('restoreFile').click();
+};
 
-statsTo.value=ymd(end);
+$('shareBtn').onclick=shareImage;
+$('downloadBtn').onclick=downloadImage;
+$('closePreviewBtn').onclick=closePreview;
 
-save();
-render();
+$('statsFrom').value=
+ ymd(
+  monday(new Date())
+ );
+
+const end=
+ new Date(
+  monday(new Date())
+ );
+
+end.setDate(
+ end.getDate()+6
+);
+
+$('statsTo').value=
+ ymd(end);
+
+$('week').value=
+ activeWeekKey;
+
+ensureWeek(
+ activeWeekKey
+);
+
+persist();
+renderAll();
 </script>
 </body>
 </html>
