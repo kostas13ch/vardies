@@ -4,443 +4,1663 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Πρόγραμμα Βαρδιών</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f5f7fb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;color:#172033}
-main{max-width:1000px;margin:auto;padding:12px}
-h1{margin:0 0 12px;padding:16px;background:#1f4e78;color:#fff;text-align:center;border-radius:14px;font-size:21px}
-.card{background:#fff;padding:12px;margin-bottom:12px;border-radius:14px;box-shadow:0 2px 10px #0001}
+body{
+ margin:0;background:#f5f7fb;color:#172033;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif
+}
+main{max-width:1100px;margin:auto;padding:12px}
+h1{
+ margin:0 0 12px;padding:16px;background:#1f4e78;color:white;
+ text-align:center;border-radius:14px;font-size:21px
+}
+h2{margin:0 0 12px}
+.card{
+ background:white;padding:12px;margin-bottom:12px;border-radius:14px;
+ box-shadow:0 2px 10px #0001
+}
 .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-input,select,textarea,button{font:inherit;padding:10px;border:1px solid #ccd2da;border-radius:9px}
-button{background:#1f4e78;color:white;border:0;font-weight:700}
+input,select,textarea,button{
+ font:inherit;padding:10px;border:1px solid #ccd2da;border-radius:9px
+}
+button{
+ background:#1f4e78;color:white;border:0;font-weight:700;cursor:pointer
+}
 .gray{background:#e8edf3;color:#172033}
+.green{background:#18794e}
 .red{background:#b42318}
-.scroll{overflow:auto}
-table{border-collapse:collapse;min-width:850px;width:100%}
-th,td{border:1px solid #aaa;padding:8px;text-align:center}
+.scroll{overflow:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;min-width:880px;width:100%}
+th,td{border:1px solid #aaa;padding:8px;text-align:center;vertical-align:middle}
 th{background:#fff2cc}
 .date td{background:#e2f0d9;font-weight:bold}
 .shift td{background:#fce4d6}
 .helper td{background:#eef4ff;vertical-align:top}
+.shift-label{font-weight:bold;white-space:nowrap}
 .helper-label{font-weight:bold;color:#344054}
 td select{width:100%}
-.candidates{display:flex;flex-direction:column;gap:4px;min-width:115px}
-.person{
- padding:6px 5px;border-radius:7px;background:#dce9f8;color:#172033;
- font-size:12px;font-weight:700;cursor:pointer;user-select:none
+
+.candidates{
+ display:flex;flex-direction:column;gap:4px;min-width:115px
 }
-.person.off{background:#eee;color:#999;text-decoration:line-through;opacity:.65}
-.reset{padding:4px 6px;font-size:11px;background:#667085;margin-top:3px}
-.grid{display:grid;grid-template-columns:1fr 80px 85px;gap:7px;align-items:center}
-.head{font-weight:bold;background:#d9eaf7;padding:8px;border-radius:7px}
-#preview{display:none;position:fixed;inset:0;background:#000a;z-index:20;padding:15px;overflow:auto}
-#previewBox{max-width:900px;margin:auto;background:white;padding:12px;border-radius:14px}
+.person{
+ padding:6px 5px;border-radius:7px;background:#dce9f8;
+ color:#172033;font-size:12px;font-weight:700;
+ cursor:pointer;user-select:none
+}
+.person.off{
+ background:#eee;color:#999;text-decoration:line-through;opacity:.65
+}
+.reset{
+ padding:4px 6px;font-size:11px;background:#667085;margin-top:3px
+}
+
+.grid{
+ display:grid;grid-template-columns:1fr 90px 90px;
+ gap:7px;align-items:center
+}
+.head{
+ font-weight:bold;background:#d9eaf7;padding:8px;border-radius:7px
+}
+
+.stats-wrap{overflow:auto}
+.stats-table{min-width:650px}
+.stats-table th{background:#d9eaf7}
+.stats-table td{background:white}
+.total{font-weight:800;background:#f2f4f7!important}
+
+#preview{
+ display:none;position:fixed;inset:0;background:#000a;
+ z-index:20;padding:15px;overflow:auto
+}
+#previewBox{
+ max-width:1000px;margin:auto;background:white;padding:12px;border-radius:14px
+}
 #preview img{width:100%;border:1px solid #ddd}
+
 .small{font-size:13px;color:#667085}
+.success{color:#18794e;font-weight:700}
 </style>
 </head>
 
 <body>
+
 <main>
+
 <h1>ΕΒΔΟΜΑΔΙΑΙΟ ΠΡΟΓΡΑΜΜΑ ΒΑΡΔΙΩΝ</h1>
 
 <div class="card">
-<div class="controls">
-<b>Δευτέρα εβδομάδας:</b>
-<input id="week" type="date">
-<button onclick="thisWeek()" class="gray">Τρέχουσα εβδομάδα</button>
-<button onclick="makeImage()">📷 Αποθήκευση εικόνας</button>
-<button onclick="clearWeek()" class="red">Καθαρισμός</button>
-</div>
+ <div class="controls">
+  <b>Δευτέρα εβδομάδας:</b>
+  <input id="week" type="date">
+
+  <button onclick="thisWeek()" class="gray">
+   Τρέχουσα εβδομάδα
+  </button>
+
+  <button onclick="addShift()" class="green">
+   ➕ Προσθήκη βάρδιας
+  </button>
+
+  <button onclick="makeImage()">
+   📷 Αποθήκευση εικόνας
+  </button>
+
+  <button onclick="clearWeek()" class="red">
+   Καθαρισμός εβδομάδας
+  </button>
+ </div>
 </div>
 
 <div class="card scroll">
-<table>
-<tr>
-<th>Βάρδιες</th>
-<th>ΔΕΥΤΕΡΑ</th><th>ΤΡΙΤΗ</th><th>ΤΕΤΑΡΤΗ</th>
-<th>ΠΕΜΠΤΗ</th><th>ΠΑΡΑΣΚΕΥΗ</th><th>ΣΑΒΒΑΤΟ</th><th>ΚΥΡΙΑΚΗ</th>
-</tr>
+ <table>
+  <thead>
+   <tr>
+    <th>Βάρδιες</th>
+    <th>ΔΕΥΤΕΡΑ</th>
+    <th>ΤΡΙΤΗ</th>
+    <th>ΤΕΤΑΡΤΗ</th>
+    <th>ΠΕΜΠΤΗ</th>
+    <th>ΠΑΡΑΣΚΕΥΗ</th>
+    <th>ΣΑΒΒΑΤΟ</th>
+    <th>ΚΥΡΙΑΚΗ</th>
+   </tr>
+  </thead>
 
-<tr class="date">
-<td>Ημερομηνία</td>
-<td id="d0"></td><td id="d1"></td><td id="d2"></td><td id="d3"></td>
-<td id="d4"></td><td id="d5"></td><td id="d6"></td>
-</tr>
-
-<tr class="shift">
-<td><b>18:00–00:00</b></td>
-<td><select data-s="e" data-d="0"></select></td>
-<td><select data-s="e" data-d="1"></select></td>
-<td><select data-s="e" data-d="2"></select></td>
-<td><select data-s="e" data-d="3"></select></td>
-<td><select data-s="e" data-d="4"></select></td>
-<td><select data-s="e" data-d="5"></select></td>
-<td><select data-s="e" data-d="6"></select></td>
-</tr>
-
-<tr class="shift">
-<td><b>00:00–06:00</b></td>
-<td><select data-s="n" data-d="0"></select></td>
-<td><select data-s="n" data-d="1"></select></td>
-<td><select data-s="n" data-d="2"></select></td>
-<td><select data-s="n" data-d="3"></select></td>
-<td><select data-s="n" data-d="4"></select></td>
-<td><select data-s="n" data-d="5"></select></td>
-<td><select data-s="n" data-d="6"></select></td>
-</tr>
-
-<tr class="helper">
-<td class="helper-label">Υποψήφιοι<br>18:00–00:00</td>
-<td id="he0"></td><td id="he1"></td><td id="he2"></td><td id="he3"></td>
-<td id="he4"></td><td id="he5"></td><td id="he6"></td>
-</tr>
-
-<tr class="helper">
-<td class="helper-label">Υποψήφιοι<br>00:00–06:00</td>
-<td id="hn0"></td><td id="hn1"></td><td id="hn2"></td><td id="hn3"></td>
-<td id="hn4"></td><td id="hn5"></td><td id="hn6"></td>
-</tr>
-
-<tr>
-<td><b>Σημειώσεις</b></td>
-<td colspan="7"><textarea id="notes" style="width:100%"></textarea></td>
-</tr>
-</table>
+  <tbody id="scheduleBody"></tbody>
+ </table>
 </div>
 
 <div class="card">
-<h2>Ονόματα προσωπικού</h2>
-<div id="people" class="grid"></div>
-<div class="controls" style="margin-top:12px">
-<input id="newName" placeholder="Νέο όνομα">
-<button onclick="addName()">Προσθήκη</button>
+ <h2>Ονόματα προσωπικού</h2>
+
+ <div id="people" class="grid"></div>
+
+ <div class="controls" style="margin-top:12px">
+  <input id="newName" placeholder="Νέο όνομα">
+  <button onclick="addName()">Προσθήκη</button>
+ </div>
+
+ <p class="small">
+  Οι βοηθητικές γραμμές χρησιμοποιούνται μόνο για την επιλογή σου
+  και δεν εμφανίζονται στην τελική εικόνα.
+ </p>
 </div>
-<p class="small">
-Πατάς ένα όνομα στις βοηθητικές γραμμές για να το αποκλείσεις ή να το επαναφέρεις.
-Οι βοηθητικές γραμμές δεν εμφανίζονται στην τελική εικόνα.
-</p>
+
+<div class="card">
+
+ <h2>🔎 Στατιστικά βαρδιών</h2>
+
+ <div class="controls">
+  <b>Από:</b>
+  <input id="statsFrom" type="date">
+
+  <b>Έως:</b>
+  <input id="statsTo" type="date">
+
+  <button onclick="calculateStats()">
+   Υπολογισμός
+  </button>
+ </div>
+
+ <div id="statsResult" style="margin-top:14px"></div>
+
 </div>
+
+<div class="card">
+
+ <h2>💾 Αντίγραφο ασφαλείας</h2>
+
+ <div class="controls">
+  <button onclick="backupData()">
+   Αποθήκευση Backup
+  </button>
+
+  <button onclick="restoreFile.click()" class="gray">
+   Επαναφορά Backup
+  </button>
+
+  <input
+   id="restoreFile"
+   type="file"
+   accept=".json,application/json"
+   style="display:none"
+  >
+ </div>
+
+ <p class="small">
+  Το backup περιέχει ονόματα, όλες τις εβδομάδες,
+  πρόσθετες βάρδιες και ιστορικό.
+ </p>
+
+</div>
+
 </main>
 
+
 <div id="preview">
-<div id="previewBox">
-<h3>Εικόνα προγράμματος</h3>
-<img id="img">
-<div class="controls" style="margin-top:10px">
-<button onclick="shareImage()">Κοινοποίηση / Αποθήκευση</button>
-<button onclick="downloadImage()" class="gray">Λήψη PNG</button>
-<button onclick="closePreview()" class="gray">Κλείσιμο</button>
+ <div id="previewBox">
+
+  <h3>Εικόνα προγράμματος</h3>
+
+  <img id="img">
+
+  <div class="controls" style="margin-top:10px">
+
+   <button onclick="shareImage()">
+    Κοινοποίηση / Αποθήκευση
+   </button>
+
+   <button onclick="downloadImage()" class="gray">
+    Λήψη PNG
+   </button>
+
+   <button onclick="closePreview()" class="gray">
+    Κλείσιμο
+   </button>
+
+  </div>
+
+ </div>
 </div>
-</div>
-</div>
+
 
 <script>
-const KEY="vardies_v2";
-let old=JSON.parse(localStorage.getItem("vardies_v1")||"null");
-let state=JSON.parse(localStorage.getItem(KEY)||"null")||
-(old?{names:old.names,weeks:old.weeks}:{names:["ΔΗΜΗΤΡΗΣ","ΧΡΗΣΤΟΣ","ΚΩΣΤΑΣ","ΣΤΕΦΑΝΟΣ","ΝΙΚΟΣ"],weeks:{}});
 
-let blob,url;
+const KEY="vardies_v3";
+
+let blob=null;
+let imageUrl=null;
+
+
+/* ---------- ΒΑΣΙΚΕΣ ΣΥΝΑΡΤΗΣΕΙΣ ---------- */
 
 const pad=n=>String(n).padStart(2,"0");
-const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
-const fmt=d=>pad(d.getDate())+"/"+pad(d.getMonth()+1);
 
-function monday(d){
- d=new Date(d);
+const ymd=d=>
+ d.getFullYear()+"-"+
+ pad(d.getMonth()+1)+"-"+
+ pad(d.getDate());
+
+const fmt=d=>
+ pad(d.getDate())+"/"+
+ pad(d.getMonth()+1);
+
+function monday(date){
+
+ let d=new Date(date);
+
  let x=(d.getDay()+6)%7;
+
  d.setDate(d.getDate()-x);
- return d
+
+ d.setHours(12,0,0,0);
+
+ return d;
+
 }
+
+function makeId(){
+
+ return "s"+Date.now()+"_"+Math.floor(Math.random()*100000);
+
+}
+
+
+/* ---------- ΦΟΡΤΩΣΗ / ΜΕΤΑΦΟΡΑ ΠΑΛΙΩΝ ΔΕΔΟΜΕΝΩΝ ---------- */
+
+function loadState(){
+
+ let newest=JSON.parse(localStorage.getItem(KEY)||"null");
+
+ if(newest)return newest;
+
+
+ let old2=JSON.parse(localStorage.getItem("vardies_v2")||"null");
+
+ if(old2){
+
+  let migrated={
+   names:old2.names||[],
+   weeks:{}
+  };
+
+  Object.entries(old2.weeks||{}).forEach(([weekKey,w])=>{
+
+   migrated.weeks[weekKey]={
+    notes:w.notes||"",
+    shifts:[
+     {
+      id:"base_e",
+      label:"18:00–00:00",
+      fixed:true,
+      assignments:w.e||Array(7).fill(""),
+      excluded:w.excludedE||
+       Array.from({length:7},()=>[])
+     },
+     {
+      id:"base_n",
+      label:"00:00–06:00",
+      fixed:true,
+      assignments:w.n||Array(7).fill(""),
+      excluded:w.excludedN||
+       Array.from({length:7},()=>[])
+     }
+    ]
+   };
+
+  });
+
+  return migrated;
+
+ }
+
+
+ let old1=JSON.parse(localStorage.getItem("vardies_v1")||"null");
+
+ if(old1){
+
+  let migrated={
+   names:old1.names||[],
+   weeks:{}
+  };
+
+  Object.entries(old1.weeks||{}).forEach(([weekKey,w])=>{
+
+   migrated.weeks[weekKey]={
+    notes:w.notes||"",
+    shifts:[
+     {
+      id:"base_e",
+      label:"18:00–00:00",
+      fixed:true,
+      assignments:w.e||Array(7).fill(""),
+      excluded:Array.from({length:7},()=>[])
+     },
+     {
+      id:"base_n",
+      label:"00:00–06:00",
+      fixed:true,
+      assignments:w.n||Array(7).fill(""),
+      excluded:Array.from({length:7},()=>[])
+     }
+    ]
+   };
+
+  });
+
+  return migrated;
+
+ }
+
+
+ return{
+  names:[
+   "ΔΗΜΗΤΡΗΣ",
+   "ΧΡΗΣΤΟΣ",
+   "ΚΩΣΤΑΣ",
+   "ΣΤΕΦΑΝΟΣ",
+   "ΝΙΚΟΣ"
+  ],
+  weeks:{}
+ };
+
+}
+
+
+let state=loadState();
+
+
+function save(){
+
+ localStorage.setItem(KEY,JSON.stringify(state));
+
+}
+
+
+/* ---------- ΕΒΔΟΜΑΔΑ ---------- */
 
 week.value=ymd(monday(new Date()));
 
-function save(){
- localStorage.setItem(KEY,JSON.stringify(state))
-}
 
-function W(){
- let k=week.value;
- if(!state.weeks[k]){
-  state.weeks[k]={
-   e:Array(7).fill(""),
-   n:Array(7).fill(""),
-   notes:"",
-   excludedE:Array.from({length:7},()=>[]),
-   excludedN:Array.from({length:7},()=>[])
-  };
- }
- let w=state.weeks[k];
+function defaultWeek(){
 
- if(!w.e)w.e=Array(7).fill("");
- if(!w.n)w.n=Array(7).fill("");
- if(!w.notes)w.notes="";
- if(!w.excludedE)w.excludedE=Array.from({length:7},()=>[]);
- if(!w.excludedN)w.excludedN=Array.from({length:7},()=>[]);
-
- return w
-}
-
-function dates(){
- let b=new Date(week.value+"T12:00");
- for(let i=0;i<7;i++){
-  let x=new Date(b);
-  x.setDate(b.getDate()+i);
-  document.getElementById("d"+i).textContent=fmt(x)
- }
-}
-
-function render(){
- dates();
- let w=W();
-
- document.querySelectorAll("select[data-s]").forEach(s=>{
-  let val=w[s.dataset.s][+s.dataset.d];
-  s.innerHTML='<option value="">—</option>'+
-   state.names.map(n=>`<option>${n}</option>`).join("");
-  s.value=val;
-  s.onchange=()=>{
-   w[s.dataset.s][+s.dataset.d]=s.value;
-   save();
-   people()
-  }
- });
-
- notes.value=w.notes;
- notes.oninput=()=>{
-  w.notes=notes.value;
-  save()
+ return{
+  notes:"",
+  shifts:[
+   {
+    id:"base_e",
+    label:"18:00–00:00",
+    fixed:true,
+    assignments:Array(7).fill(""),
+    excluded:Array.from({length:7},()=>[])
+   },
+   {
+    id:"base_n",
+    label:"00:00–06:00",
+    fixed:true,
+    assignments:Array(7).fill(""),
+    excluded:Array.from({length:7},()=>[])
+   }
+  ]
  };
 
- renderHelpers();
- people()
 }
 
-function renderHelpers(){
- let w=W();
 
- for(let d=0;d<7;d++){
-  helperCell("he"+d,"excludedE",d,w);
-  helperCell("hn"+d,"excludedN",d,w);
+function W(){
+
+ let k=week.value;
+
+ if(!state.weeks[k]){
+
+  state.weeks[k]=defaultWeek();
+
  }
-}
 
-function helperCell(id,key,day,w){
- let el=document.getElementById(id);
- let excluded=w[key][day]||[];
 
- el.innerHTML='<div class="candidates">'+
-  state.names.map((n,i)=>{
-   let off=excluded.includes(n);
-   return `<div class="person ${off?"off":""}" onclick="toggleCandidate('${key}',${day},${i})">${n}</div>`
-  }).join("")+
-  `<button class="reset" onclick="resetCandidates('${key}',${day})">Επαναφορά</button></div>`;
-}
+ let w=state.weeks[k];
 
-function toggleCandidate(key,day,index){
- let w=W();
- let name=state.names[index];
- let arr=w[key][day]||[];
- let p=arr.indexOf(name);
 
- if(p>=0)arr.splice(p,1);
- else arr.push(name);
+ if(!Array.isArray(w.shifts)){
 
- w[key][day]=arr;
- save();
- renderHelpers()
-}
+  w=defaultWeek();
 
-function resetCandidates(key,day){
- let w=W();
- w[key][day]=[];
- save();
- renderHelpers()
-}
+  state.weeks[k]=w;
 
-function people(){
- let p=document.getElementById("people"),w=W();
+ }
 
- p.innerHTML=
- '<div class="head">Όνομα</div>'+
- '<div class="head">Βάρδιες</div>'+
- '<div class="head"></div>';
 
- state.names.forEach((n,i)=>{
-  let count=[...w.e,...w.n].filter(x=>x==n).length;
+ w.shifts.forEach(s=>{
 
-  p.innerHTML+=
-   `<input value="${n}" onchange="rename(${i},this.value)">
-    <b style="text-align:center">${count}</b>
-    <button class="gray" onclick="del(${i})">Διαγρ.</button>`
- })
-}
+  if(!Array.isArray(s.assignments))
+   s.assignments=Array(7).fill("");
 
-function rename(i,n){
- let oldName=state.names[i];
- n=n.trim().toUpperCase();
- if(!n)return;
+  if(!Array.isArray(s.excluded))
+   s.excluded=Array.from({length:7},()=>[]);
 
- Object.values(state.weeks).forEach(w=>{
-  w.e=(w.e||[]).map(x=>x==oldName?n:x);
-  w.n=(w.n||[]).map(x=>x==oldName?n:x);
+  while(s.assignments.length<7)s.assignments.push("");
 
-  ["excludedE","excludedN"].forEach(k=>{
-   if(w[k]){
-    w[k]=w[k].map(arr=>(arr||[]).map(x=>x==oldName?n:x))
-   }
-  })
+  while(s.excluded.length<7)s.excluded.push([]);
+
  });
 
- state.names[i]=n;
- save();
- render()
+
+ return w;
+
 }
 
-function addName(){
- let n=newName.value.trim().toUpperCase();
- if(!n||state.names.includes(n))return;
 
- state.names.push(n);
- newName.value="";
- save();
- render()
+/* ---------- ΠΡΟΓΡΑΜΜΑ ---------- */
+
+function getWeekDates(){
+
+ let base=new Date(week.value+"T12:00:00");
+
+ let arr=[];
+
+ for(let i=0;i<7;i++){
+
+  let d=new Date(base);
+
+  d.setDate(base.getDate()+i);
+
+  arr.push(d);
+
+ }
+
+ return arr;
+
 }
 
-function del(i){
- if(confirm("Διαγραφή ονόματος;")){
-  let n=state.names[i];
-  state.names.splice(i,1);
 
-  Object.values(state.weeks).forEach(w=>{
-   w.e=(w.e||[]).map(x=>x==n?"":x);
-   w.n=(w.n||[]).map(x=>x==n?"":x);
+function render(){
 
-   ["excludedE","excludedN"].forEach(k=>{
-    if(w[k]){
-     w[k]=w[k].map(arr=>(arr||[]).filter(x=>x!=n))
-    }
-   })
+ let body=document.getElementById("scheduleBody");
+
+ body.innerHTML="";
+
+
+ let dates=getWeekDates();
+
+
+ let dateRow=document.createElement("tr");
+
+ dateRow.className="date";
+
+ dateRow.innerHTML=
+  "<td>Ημερομηνία</td>"+
+  dates.map(d=>`<td>${fmt(d)}</td>`).join("");
+
+ body.appendChild(dateRow);
+
+
+ let w=W();
+
+
+ w.shifts.forEach(shift=>{
+
+  let row=document.createElement("tr");
+
+  row.className="shift";
+
+
+  let first=document.createElement("td");
+
+  first.className="shift-label";
+
+
+  first.innerHTML=
+   `<div>${shift.label}</div>`+
+   (!shift.fixed
+    ? `<button class="red"
+        style="font-size:11px;padding:4px 6px;margin-top:5px"
+        onclick="deleteShift('${shift.id}')">
+        Διαγραφή
+       </button>`
+    :"");
+
+
+  row.appendChild(first);
+
+
+  for(let day=0;day<7;day++){
+
+   let td=document.createElement("td");
+
+   let select=document.createElement("select");
+
+
+   let blank=document.createElement("option");
+
+   blank.value="";
+
+   blank.textContent="—";
+
+   select.appendChild(blank);
+
+
+   state.names.forEach(name=>{
+
+    let option=document.createElement("option");
+
+    option.value=name;
+
+    option.textContent=name;
+
+    select.appendChild(option);
+
+   });
+
+
+   select.value=shift.assignments[day]||"";
+
+
+   select.onchange=()=>{
+
+    shift.assignments[day]=select.value;
+
+    save();
+
+    renderPeople();
+
+   };
+
+
+   td.appendChild(select);
+
+   row.appendChild(td);
+
+  }
+
+
+  body.appendChild(row);
+
+
+  let helper=document.createElement("tr");
+
+  helper.className="helper";
+
+
+  helper.innerHTML=
+   `<td class="helper-label">
+     Υποψήφιοι<br>${shift.label}
+    </td>`;
+
+
+  for(let day=0;day<7;day++){
+
+   let td=document.createElement("td");
+
+   td.appendChild(
+    makeCandidateBox(shift,day)
+   );
+
+   helper.appendChild(td);
+
+  }
+
+
+  body.appendChild(helper);
+
+ });
+
+
+ let notesRow=document.createElement("tr");
+
+
+ notesRow.innerHTML=
+  `<td><b>Σημειώσεις</b></td>
+   <td colspan="7">
+    <textarea
+     id="notes"
+     rows="3"
+     style="width:100%"
+    ></textarea>
+   </td>`;
+
+
+ body.appendChild(notesRow);
+
+
+ let notes=document.getElementById("notes");
+
+ notes.value=w.notes||"";
+
+ notes.oninput=()=>{
+
+  w.notes=notes.value;
+
+  save();
+
+ };
+
+
+ renderPeople();
+
+ save();
+
+}
+
+
+function makeCandidateBox(shift,day){
+
+ let wrap=document.createElement("div");
+
+ wrap.className="candidates";
+
+
+ let excluded=shift.excluded[day]||[];
+
+
+ state.names.forEach(name=>{
+
+  let div=document.createElement("div");
+
+  div.className=
+   "person"+
+   (excluded.includes(name)?" off":"");
+
+
+  div.textContent=name;
+
+
+  div.onclick=()=>{
+
+   let arr=shift.excluded[day]||[];
+
+   let i=arr.indexOf(name);
+
+
+   if(i>=0){
+
+    arr.splice(i,1);
+
+   }else{
+
+    arr.push(name);
+
+   }
+
+
+   shift.excluded[day]=arr;
+
+   save();
+
+   render();
+
+  };
+
+
+  wrap.appendChild(div);
+
+ });
+
+
+ let reset=document.createElement("button");
+
+ reset.className="reset";
+
+ reset.textContent="Επαναφορά";
+
+
+ reset.onclick=()=>{
+
+  shift.excluded[day]=[];
+
+  save();
+
+  render();
+
+ };
+
+
+ wrap.appendChild(reset);
+
+
+ return wrap;
+
+}
+
+
+/* ---------- ΠΡΟΣΘΗΚΗ / ΔΙΑΓΡΑΦΗ ΒΑΡΔΙΑΣ ---------- */
+
+function addShift(){
+
+ let label=prompt(
+  "Γράψε το ωράριο ή την ονομασία της νέας βάρδιας:",
+  "06:00–12:00"
+ );
+
+
+ if(!label)return;
+
+
+ label=label.trim();
+
+
+ if(!label)return;
+
+
+ let w=W();
+
+
+ w.shifts.push({
+
+  id:makeId(),
+
+  label,
+
+  fixed:false,
+
+  assignments:Array(7).fill(""),
+
+  excluded:Array.from({length:7},()=>[])
+
+ });
+
+
+ save();
+
+ render();
+
+}
+
+
+function deleteShift(id){
+
+ let w=W();
+
+
+ let s=w.shifts.find(x=>x.id===id);
+
+
+ if(!s||s.fixed)return;
+
+
+ if(
+  !confirm(
+   `Να διαγραφεί η βάρδια "${s.label}" από αυτή την εβδομάδα;`
+  )
+ )return;
+
+
+ w.shifts=w.shifts.filter(x=>x.id!==id);
+
+
+ save();
+
+ render();
+
+}
+
+
+/* ---------- ΟΝΟΜΑΤΑ ---------- */
+
+function renderPeople(){
+
+ let p=document.getElementById("people");
+
+ let w=W();
+
+
+ p.innerHTML=
+  '<div class="head">Όνομα</div>'+
+  '<div class="head">Βάρδιες</div>'+
+  '<div class="head"></div>';
+
+
+ state.names.forEach((name,index)=>{
+
+  let count=0;
+
+
+  w.shifts.forEach(s=>{
+
+   count+=
+    s.assignments.filter(x=>x===name).length;
+
   });
 
-  save();
-  render()
- }
+
+  let input=document.createElement("input");
+
+  input.value=name;
+
+
+  input.onchange=()=>{
+
+   rename(index,input.value);
+
+  };
+
+
+  let total=document.createElement("b");
+
+  total.style.textAlign="center";
+
+  total.textContent=count;
+
+
+  let delBtn=document.createElement("button");
+
+  delBtn.className="gray";
+
+  delBtn.textContent="Διαγρ.";
+
+
+  delBtn.onclick=()=>{
+
+   deleteName(index);
+
+  };
+
+
+  p.appendChild(input);
+
+  p.appendChild(total);
+
+  p.appendChild(delBtn);
+
+ });
+
 }
+
+
+function rename(index,newName){
+
+ let oldName=state.names[index];
+
+
+ newName=newName.trim().toUpperCase();
+
+
+ if(!newName)return;
+
+
+ Object.values(state.weeks).forEach(w=>{
+
+  (w.shifts||[]).forEach(s=>{
+
+   s.assignments=
+    (s.assignments||[])
+    .map(x=>x===oldName?newName:x);
+
+
+   s.excluded=
+    (s.excluded||[])
+    .map(arr=>
+     (arr||[])
+     .map(x=>x===oldName?newName:x)
+    );
+
+  });
+
+ });
+
+
+ state.names[index]=newName;
+
+
+ save();
+
+ render();
+
+}
+
+
+function addName(){
+
+ let input=document.getElementById("newName");
+
+ let name=input.value.trim().toUpperCase();
+
+
+ if(!name)return;
+
+
+ if(state.names.includes(name)){
+
+  alert("Το όνομα υπάρχει ήδη.");
+
+  return;
+
+ }
+
+
+ state.names.push(name);
+
+ input.value="";
+
+
+ save();
+
+ render();
+
+}
+
+
+function deleteName(index){
+
+ let name=state.names[index];
+
+
+ if(!confirm(`Να διαγραφεί ο ${name};`))
+  return;
+
+
+ state.names.splice(index,1);
+
+
+ Object.values(state.weeks).forEach(w=>{
+
+  (w.shifts||[]).forEach(s=>{
+
+   s.assignments=
+    (s.assignments||[])
+    .map(x=>x===name?"":x);
+
+
+   s.excluded=
+    (s.excluded||[])
+    .map(arr=>
+     (arr||[])
+     .filter(x=>x!==name)
+    );
+
+  });
+
+ });
+
+
+ save();
+
+ render();
+
+}
+
+
+/* ---------- ΑΛΛΑΓΗ ΕΒΔΟΜΑΔΑΣ ---------- */
 
 function thisWeek(){
- week.value=ymd(monday(new Date()));
- render()
+
+ week.value=ymd(
+  monday(new Date())
+ );
+
+ render();
+
 }
 
-function clearWeek(){
- if(confirm("Καθαρισμός αυτής της εβδομάδας;")){
-  delete state.weeks[week.value];
-  save();
-  render()
- }
-}
 
 week.onchange=render;
 
-function makeImage(){
- let w=W();
- let days=["ΔΕΥΤΕΡΑ","ΤΡΙΤΗ","ΤΕΤΑΡΤΗ","ΠΕΜΠΤΗ","ΠΑΡΑΣΚΕΥΗ","ΣΑΒΒΑΤΟ","ΚΥΡΙΑΚΗ"];
 
- let b=new Date(week.value+"T12:00"),ds=[];
- for(let i=0;i<7;i++){
-  let x=new Date(b);
-  x.setDate(b.getDate()+i);
-  ds.push(fmt(x))
+function clearWeek(){
+
+ if(
+  !confirm(
+   "Να καθαριστεί όλο το πρόγραμμα αυτής της εβδομάδας;"
+  )
+ )return;
+
+
+ delete state.weeks[week.value];
+
+
+ save();
+
+ render();
+
+}
+
+
+/* ---------- ΣΤΑΤΙΣΤΙΚΑ ---------- */
+
+function calculateStats(){
+
+ let fromVal=
+  document.getElementById("statsFrom").value;
+
+ let toVal=
+  document.getElementById("statsTo").value;
+
+
+ if(!fromVal||!toVal){
+
+  alert("Επίλεξε ημερομηνία από και έως.");
+
+  return;
+
  }
 
- let c=document.createElement("canvas");
- let ctx=c.getContext("2d");
- let WID=1400,L=200,C=(WID-L)/7,H=430;
 
- c.width=WID*2;
- c.height=H*2;
- ctx.scale(2,2);
+ let from=
+  new Date(fromVal+"T12:00:00");
 
- ctx.fillStyle="white";
- ctx.fillRect(0,0,WID,H);
+ let to=
+  new Date(toVal+"T12:00:00");
 
- function cell(x,y,ww,hh,color,t,bold=false){
-  ctx.fillStyle=color;
-  ctx.fillRect(x,y,ww,hh);
-  ctx.strokeStyle="#777";
-  ctx.strokeRect(x,y,ww,hh);
-  ctx.fillStyle="#111";
-  ctx.font=(bold?"bold ":"")+"20px Arial";
-  ctx.textAlign="center";
-  ctx.textBaseline="middle";
-  ctx.fillText(t||"—",x+ww/2,y+hh/2)
+
+ if(from>to){
+
+  alert("Η ημερομηνία «Από» πρέπει να είναι πριν από την «Έως».");
+
+  return;
+
  }
 
- ctx.fillStyle="#1f4e78";
- ctx.fillRect(0,0,WID,70);
- ctx.fillStyle="white";
- ctx.font="bold 30px Arial";
- ctx.textAlign="center";
- ctx.fillText("ΕΒΔΟΜΑΔΙΑΙΟ ΠΡΟΓΡΑΜΜΑ ΒΑΡΔΙΩΝ",WID/2,43);
 
- cell(0,70,L,60,"#fff2cc","Βάρδιες",true);
- days.forEach((x,i)=>cell(L+i*C,70,C,60,"#fff2cc",x,true));
+ let totals={};
 
- cell(0,130,L,55,"#e2f0d9","Ημερομηνία",true);
- ds.forEach((x,i)=>cell(L+i*C,130,C,55,"#e2f0d9",x,true));
+ let shiftTotals={};
 
- cell(0,185,L,80,"#fce4d6","18:00–00:00",true);
- w.e.forEach((x,i)=>cell(L+i*C,185,C,80,"#fce4d6",x));
+ let labels=new Set();
 
- cell(0,265,L,80,"#fce4d6","00:00–06:00",true);
- w.n.forEach((x,i)=>cell(L+i*C,265,C,80,"#fce4d6",x));
 
- cell(0,345,L,70,"#d9eaf7","Σημειώσεις",true);
- cell(L,345,WID-L,70,"white",w.notes||"");
+ state.names.forEach(name=>{
 
- c.toBlob(b=>{
-  blob=b;
+  totals[name]=0;
 
-  if(url)URL.revokeObjectURL(url);
-  url=URL.createObjectURL(b);
+  shiftTotals[name]={};
 
-  img.src=url;
-  preview.style.display="block"
- },"image/png")
+ });
+
+
+ for(
+  let d=new Date(from);
+  d<=to;
+  d.setDate(d.getDate()+1)
+ ){
+
+  let dayDate=new Date(d);
+
+  let mon=monday(dayDate);
+
+  let weekKey=ymd(mon);
+
+  let w=state.weeks[weekKey];
+
+
+  if(!w||!Array.isArray(w.shifts))
+   continue;
+
+
+  let dayIndex=
+   (dayDate.getDay()+6)%7;
+
+
+  w.shifts.forEach(s=>{
+
+   let name=
+    s.assignments?.[dayIndex]||"";
+
+
+   if(!name)return;
+
+
+   labels.add(s.label);
+
+
+   if(!(name in totals)){
+
+    totals[name]=0;
+
+    shiftTotals[name]={};
+
+   }
+
+
+   totals[name]++;
+
+
+   shiftTotals[name][s.label]=
+    (shiftTotals[name][s.label]||0)+1;
+
+  });
+
+ }
+
+
+ let orderedLabels=[...labels];
+
+
+ let names=[
+  ...new Set([
+   ...state.names,
+   ...Object.keys(totals)
+  ])
+ ];
+
+
+ let html=
+  '<div class="stats-wrap">'+
+  '<table class="stats-table">'+
+  '<thead><tr>'+
+  '<th>Όνομα</th>';
+
+
+ orderedLabels.forEach(label=>{
+
+  html+=`<th>${label}</th>`;
+
+ });
+
+
+ html+='<th>ΣΥΝΟΛΟ</th></tr></thead><tbody>';
+
+
+ names.forEach(name=>{
+
+  html+=`<tr><td><b>${name}</b></td>`;
+
+
+  orderedLabels.forEach(label=>{
+
+   html+=
+    `<td>${shiftTotals[name]?.[label]||0}</td>`;
+
+  });
+
+
+  html+=
+   `<td class="total">${totals[name]||0}</td></tr>`;
+
+ });
+
+
+ html+='</tbody></table></div>';
+
+
+ html+=
+  `<p class="small">
+   Περίοδος: ${fmt(from)} έως ${fmt(to)}
+  </p>`;
+
+
+ document.getElementById(
+  "statsResult"
+ ).innerHTML=html;
+
 }
 
-function closePreview(){
- preview.style.display="none"
-}
 
-function downloadImage(){
- let a=document.createElement("a");
- a.href=url;
- a.download="programma-"+week.value+".png";
- a.click()
-}
+/* ---------- BACKUP ---------- */
 
-async function shareImage(){
- let f=new File(
-  [blob],
-  "programma-"+week.value+".png",
-  {type:"image/png"}
+function backupData(){
+
+ save();
+
+
+ let data=JSON.stringify(
+  state,
+  null,
+  2
  );
 
- if(navigator.share&&navigator.canShare&&navigator.canShare({files:[f]})){
-  await navigator.share({
-   files:[f],
-   title:"Πρόγραμμα Βαρδιών"
-  });
- }else{
-  downloadImage()
- }
+
+ let b=new Blob(
+  [data],
+  {type:"application/json"}
+ );
+
+
+ let u=URL.createObjectURL(b);
+
+
+ let a=document.createElement("a");
+
+
+ a.href=u;
+
+ a.download=
+  "vardies-backup-"+
+  ymd(new Date())+
+  ".json";
+
+
+ document.body.appendChild(a);
+
+ a.click();
+
+ a.remove();
+
+
+ setTimeout(
+  ()=>URL.revokeObjectURL(u),
+  1000
+ );
+
 }
 
+
+restoreFile.onchange=e=>{
+
+ let file=e.target.files?.[0];
+
+
+ if(!file)return;
+
+
+ let reader=new FileReader();
+
+
+ reader.onload=()=>{
+
+  try{
+
+   let data=JSON.parse(reader.result);
+
+
+   if(
+    !data||
+    !Array.isArray(data.names)||
+    typeof data.weeks!=="object"
+   ){
+
+    throw new Error();
+
+   }
+
+
+   state=data;
+
+
+   save();
+
+   render();
+
+
+   alert(
+    "Το backup επαναφέρθηκε επιτυχώς."
+   );
+
+  }catch{
+
+   alert(
+    "Το αρχείο backup δεν είναι έγκυρο."
+   );
+
+  }
+
+ };
+
+
+ reader.readAsText(file);
+
+
+ e.target.value="";
+
+};
+
+
+/* ---------- ΕΙΚΟΝΑ ---------- */
+
+function makeImage(){
+
+ let w=W();
+
+ let dates=getWeekDates();
+
+
+ let days=[
+  "ΔΕΥΤΕΡΑ",
+  "ΤΡΙΤΗ",
+  "ΤΕΤΑΡΤΗ",
+  "ΠΕΜΠΤΗ",
+  "ΠΑΡΑΣΚΕΥΗ",
+  "ΣΑΒΒΑΤΟ",
+  "ΚΥΡΙΑΚΗ"
+ ];
+
+
+ let WID=1400;
+
+ let LEFT=200;
+
+ let COL=(WID-LEFT)/7;
+
+
+ let titleH=70;
+
+ let headerH=60;
+
+ let dateH=55;
+
+ let shiftH=80;
+
+ let noteH=70;
+
+
+ let H=
+  titleH+
+  headerH+
+  dateH+
+  (shiftH*w.shifts.length)+
+  noteH;
+
+
+ let canvas=document.createElement("canvas");
+
+
+ canvas.width=WID*2;
+
+ canvas.height=H*2;
+
+
+ let ctx=canvas.getContext("2d");
+
+
+ ctx.scale(2,2);
+
+
+ ctx.fillStyle="white";
+
+ ctx.fillRect(0,0,WID,H);
+
+
+ function cell(
+  x,y,width,height,color,text,bold=false
+ ){
+
+  ctx.fillStyle=color;
+
+  ctx.fillRect(
+   x,y,width,height
+  );
+
+
+  ctx.strokeStyle="#777";
+
+  ctx.strokeRect(
+   x,y,width,height
+  );
+
+
+  ctx.fillStyle="#111";
+
+
+  ctx.font=
+   (bold?"bold ":"")+
+   "20px Arial";
+
+
+  ctx.textAlign="center";
+
+  ctx.textBaseline="middle";
+
+
+  let txt=text||"—";
+
+
+  while(
+   ctx.measureText(txt).width>
+   width-12 &&
+   txt.length>3
+  ){
+
+   txt=txt.slice(0,-1);
+
+  }
+
+
+  if(txt!==text&&text)
+   txt+="…";
+
+
+  ctx.fillText(
+   txt,
+   x+width/2,
+   y+height/2
+  );
+
+ }
+
+
+ ctx.fillStyle="#1f4e78";
+
+ ctx.fillRect(
+  0,0,WID,titleH
+ );
+
+
+ ctx.fillStyle="white";
+
+ ctx.font="bold 30px Arial";
+
+ ctx.textAlign="center";
+
+ ctx.textBaseline="middle";
+
+
+ ctx.fillText(
+  "ΕΒΔΟΜΑΔΙΑΙΟ ΠΡΟΓΡΑΜΜΑ ΒΑΡΔΙΩΝ",
+  WID/2,
+  titleH/2
+ );
+
+
+ let y=titleH;
+
+
+ cell(
+  0,y,LEFT,headerH,
+  "#fff2cc",
+  "Βάρδιες",
+  true
+ );
+
+
+ days.forEach((day,i)=>{
+
+  cell(
+   LEFT+i*COL,
+   y,
+   COL,
+   headerH,
+   "#fff2cc",
+   day,
+   true
+  );
+
+ });
+
+
+ y+=headerH;
+
+
+ cell(
+  0,y,LEFT,dateH,
+  "#e2f0d9",
+  "Ημερομηνία",
+  true
+ );
+
+
+ dates.forEach((d,i)=>{
+
+  cell(
+   LEFT+i*COL,
+   y,
+   COL,
+   dateH,
+   "#e2f0d9",
+   fmt(d),
+   true
+  );
+
+ });
+
+
+ y+=dateH;
+
+
+ w.shifts.forEach(shift=>{
+
+  cell(
+   0,y,LEFT,shiftH,
+   "#fce4d6",
+   shift.label,
+   true
+  );
+
+
+  shift.assignments.forEach((name,i)=>{
+
+   cell(
+    LEFT+i*COL,
+    y,
+    COL,
+    shiftH,
+    "#fce4d6",
+    name
+   );
+
+  });
+
+
+  y+=shiftH;
+
+ });
+
+
+ cell(
+  0,y,LEFT,noteH,
+  "#d9eaf7",
+  "Σημειώσεις",
+  true
+ );
+
+
+ cell(
+  LEFT,
+  y,
+  WID-LEFT,
+  noteH,
+  "white",
+  w.notes||""
+ );
+
+
+ canvas.toBlob(b=>{
+
+  blob=b;
+
+
+  if(imageUrl)
+   URL.revokeObjectURL(imageUrl);
+
+
+  imageUrl=
+   URL.createObjectURL(b);
+
+
+  img.src=imageUrl;
+
+
+  preview.style.display="block";
+
+ },"image/png");
+
+}
+
+
+function closePreview(){
+
+ preview.style.display="none";
+
+}
+
+
+function downloadImage(){
+
+ if(!imageUrl)return;
+
+
+ let a=document.createElement("a");
+
+
+ a.href=imageUrl;
+
+
+ a.download=
+  "programma-"+
+  week.value+
+  ".png";
+
+
+ a.click();
+
+}
+
+
+async function shareImage(){
+
+ if(!blob)return;
+
+
+ let file=
+  new File(
+   [blob],
+   "programma-"+week.value+".png",
+   {type:"image/png"}
+  );
+
+
+ if(
+  navigator.share &&
+  navigator.canShare &&
+  navigator.canShare({files:[file]})
+ ){
+
+  try{
+
+   await navigator.share({
+    files:[file],
+    title:"Πρόγραμμα Βαρδιών"
+   });
+
+  }catch{}
+
+ }else{
+
+  downloadImage();
+
+ }
+
+}
+
+
+/* ---------- ΑΡΧΙΚΕΣ ΗΜΕΡΟΜΗΝΙΕΣ ΣΤΑΤΙΣΤΙΚΩΝ ---------- */
+
+statsFrom.value=
+ ymd(
+  monday(new Date())
+ );
+
+
+let endWeek=
+ new Date(
+  monday(new Date())
+ );
+
+
+endWeek.setDate(
+ endWeek.getDate()+6
+);
+
+
+statsTo.value=
+ ymd(endWeek);
+
+
 save();
+
 render();
+
 </script>
+
 </body>
 </html>
